@@ -2949,14 +2949,14 @@ class RankingApp {
         const point3Title = document.getElementById('point3-title');
         const point3Desc = document.getElementById('point3-description');
         
-        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1タイトル', '圧倒的な実績＆成功率99％');
-        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1詳細', 'ダイエット成功率99％、平均13.7kg減の実績。科学的根拠に基づいた医療痩身プログラムで、確実に結果を出します。');
+        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1タイトル', '');
+        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1詳細', '');
         
-        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2タイトル', '最新の医療機器を完備');
-        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2詳細', '脂肪冷却・医療用EMS・医療ハイフ・医療ラジオ波など、最新の痩身機器を多数完備。一人一人の悩みに合わせた最適な治療を提供します。');
+        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2タイトル', '');
+        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2詳細', '');
         
-        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3タイトル', '管理栄養士による完全サポート');
-        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3詳細', '管理栄養士による食事指導で健康的にダイエット。痩せなかったら全額返金、リバウンド防止プログラム付きで安心です。');
+        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3タイトル', '');
+        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3詳細', '');
         
         // ロゴ画像を更新
         const infoLogo = document.getElementById('first-choice-info-logo');

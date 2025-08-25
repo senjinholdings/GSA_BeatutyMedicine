@@ -2840,8 +2840,18 @@ class RankingApp {
         // バナー画像を更新
         const bannerImage = document.getElementById('first-choice-banner-image');
         if (bannerImage) {
-            const bannerPath = window.dataManager.getClinicText(clinicCode, 'クリニック詳細バナー画像パス', '') || 
+            const csvBannerPath = window.dataManager.getClinicText(clinicCode, '詳細バナー画像パス', '');
+            const bannerPath = csvBannerPath ||
                              `../common_data/images//clinics/${clinicCode}/${clinicCode}_detail_bnr.webp`;
+
+            console.log(`[DEBUG] Clinic: ${clinicCode}, CSV Banner Path: "${csvBannerPath}", Final Path: "${bannerPath}"`);
+
+            // 追加のデバッグ：すべてのバナー画像要素をチェック
+            const allBannerImages = document.querySelectorAll('img[src*="_detail_bnr"]');
+            allBannerImages.forEach((img, index) => {
+                console.log(`[DEBUG] Banner image ${index}: ${img.src}, class: ${img.className}`);
+            });
+
             bannerImage.src = bannerPath;
             bannerImage.alt = topClinic.name;
         }
@@ -2854,14 +2864,14 @@ class RankingApp {
         const point3Title = document.getElementById('point3-title');
         const point3Desc = document.getElementById('point3-description');
         
-        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1タイトル', '');
-        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1詳細', '');
-        
-        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2タイトル', '');
-        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2詳細', '');
-        
-        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3タイトル', '');
-        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3詳細', '');
+        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1タイトル', '');
+        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1内容', '');
+
+        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2タイトル', '');
+        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2内容', '');
+
+        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3タイトル', '');
+        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3内容', '');
         
         // ロゴ画像を更新
         const infoLogo = document.getElementById('first-choice-info-logo');
@@ -2876,7 +2886,7 @@ class RankingApp {
         // キャンペーンテキストを更新
         const campaignText = document.getElementById('first-choice-campaign-text');
         if (campaignText) {
-            const campaign = window.dataManager.getClinicText(clinicCode, 'キャンペーン', '');
+            const campaign = window.dataManager.getClinicText(clinicCode, 'INFORMATIONキャンペーンテキスト', '');
             campaignText.innerHTML = campaign;
         }
         
@@ -2898,11 +2908,36 @@ class RankingApp {
         if (ctaLink) {
             ctaLink.href = this.urlHandler.getClinicUrlWithRegionId(topClinic.id, topClinic.rank || 1);
         }
+
+        // 公式サイトリンクを更新
+        const officialLink = document.querySelector('#first-choice-official-link a');
+        if (officialLink) {
+            // リダイレクトURLを使用（案件詳細セクションと同様）
+            officialLink.href = this.urlHandler.getClinicUrlWithRegionId(topClinic.id, topClinic.rank || 1);
+
+            // strongタグには公式サイトURLのテキストを設定
+            const strongElement = officialLink.querySelector('strong');
+            const officialUrl = window.dataManager.getClinicText(clinicCode, '公式サイトURL', '#');
+            if (strongElement) {
+                strongElement.textContent = officialUrl;
+            } else {
+                officialLink.textContent = officialUrl;
+            }
+        }
         
         // 免責事項のタイトルを更新
         const disclaimerTitle = document.getElementById('first-choice-disclaimer-title');
         if (disclaimerTitle) {
             disclaimerTitle.textContent = `${topClinic.name}の確認事項`;
+        }
+
+        // 免責事項の内容を更新
+        const disclaimerContent = document.getElementById('dio-campaign-first-choice-content');
+        if (disclaimerContent) {
+            const disclaimerText = window.dataManager.getClinicText(clinicCode, 'INFORMATION確認事項', '');
+            if (disclaimerText) {
+                disclaimerContent.innerHTML = `<div style="font-size: 9px; color: #777; line-height: 1.4;">${disclaimerText}</div>`;
+            }
         }
     }
 
