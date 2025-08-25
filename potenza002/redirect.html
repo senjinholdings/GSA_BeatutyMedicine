@@ -138,12 +138,8 @@
                     async loadCompiledData() {
                         console.log('📊 compiled-data.json読み込み中...');
                         try {
-                            // mouthpiece では data copy が正規のランキング/クリニックセット
-                            let response = await fetch('./data copy/compiled-data.json');
-                            if (!response.ok) {
-                                console.warn('⚠️ data copy/compiled-data.json が見つからないため data/ にフォールバックします');
-                                response = await fetch('./data/compiled-data.json');
-                            }
+                            // potenza002 では data/ranking/compiled-data.json を使用
+                            const response = await fetch('./data/ranking/compiled-data.json');
                             const data = await response.json();
                             this.clinics = data.clinics || [];
                             console.log('📊 クリニック数:', this.clinics.length);
@@ -399,29 +395,92 @@
             
             // region_idは既に上で取得済み
             
-            // 追跡用パラメータをparam4に統合（medical-diet001と同じ形式）
+            // 追跡用パラメータをparam4に統合（potenza002用）
             const currentPageWithParams = window.location.href;
             const baseReferrerUrl = currentPageWithParams.split('?')[0];
             const trackingParams = {
                 click_section: currentUrl.searchParams.get('click_section') || '',
                 click_clinic: currentUrl.searchParams.get('click_clinic') || clinicCode,
-                source_page: currentUrl.searchParams.get('source_page') || 'mouthpiece',
+                source_page: currentUrl.searchParams.get('source_page') || 'potenza',
                 region_id: regionId || '013',
                 referrer_url: baseReferrerUrl,  // パラメータを除いたベースURLのみ
                 timestamp: new Date().toISOString()
             };
             
-            // 全クリニック・全ランキング位に対して動的にパラメータを追加
-            // param2にutm_creativeを設定
-            const utmCreative = currentUrl.searchParams.get('utm_creative') || '';
+            // 元のページのURLパラメータを取得（複数の方法を試行）
+            let originalUrl;
+            let originalParams = new URLSearchParams();
+
+            // 方法1: referrer経由
+            try {
+                if (document.referrer && document.referrer !== window.location.href) {
+                    originalUrl = new URL(document.referrer);
+                    console.log('🔍 元ページURL (referrer):', originalUrl.toString());
+                } else {
+                    throw new Error('referrer unavailable');
+                }
+            } catch (e) {
+                console.log('⚠️ referrer取得失敗');
+                originalUrl = currentUrl;
+            }
+
+            // 方法2: localStorageから元URLのパラメータを復元
+            try {
+                const storedParams = localStorage.getItem('redirectParams');
+                if (storedParams) {
+                    const params = JSON.parse(storedParams);
+                    console.log('🔍 localStorage params:', params);
+
+                    // 元URLのパラメータを再構築
+                    if (params.original_params) {
+                        Object.entries(params.original_params).forEach(([key, value]) => {
+                            originalParams.set(key, value);
+                        });
+                        console.log('✅ 元URLパラメータ復元:', originalParams.toString());
+                    }
+                }
+            } catch (e) {
+                console.log('⚠️ localStorage パラメータ復元失敗');
+            }
+
+            // パラメータ取得用の統合関数
+            function getOriginalParam(paramName) {
+                // 1. 復元されたパラメータから取得
+                const restoredValue = originalParams.get(paramName);
+                if (restoredValue) {
+                    console.log(`🔍 ${paramName} (復元):`, restoredValue);
+                    return restoredValue;
+                }
+
+                // 2. referrer URLから取得
+                const referrerValue = originalUrl.searchParams.get(paramName);
+                if (referrerValue) {
+                    console.log(`🔍 ${paramName} (referrer):`, referrerValue);
+                    return referrerValue;
+                }
+
+                console.log(`⚠️ ${paramName} 取得失敗`);
+                return '';
+            }
+
+            // param2にutm_creativeを設定（統合取得関数使用）
+            const utmCreative = getOriginalParam('utm_creative');
             if (utmCreative) {
                 url.searchParams.set('param2', utmCreative);
+                console.log('✅ param2設定:', utmCreative);
+            } else {
+                console.log('⚠️ utm_creativeが空のためparam2は設定されません');
             }
-            
-            // param3にgclidを設定
-            const gclid = currentUrl.searchParams.get('gclid') || '';
+
+            // param3とgclidパラメータを設定（統合取得関数使用）
+            const gclid = getOriginalParam('gclid');
             if (gclid) {
                 url.searchParams.set('param3', gclid);
+                url.searchParams.set('gclid', gclid);
+                console.log('✅ param3設定:', gclid);
+                console.log('✅ gclid設定:', gclid);
+            } else {
+                console.log('⚠️ gclidが空のためparam3とgclidは設定されません');
             }
             
             // param4として追跡データをエンコード
@@ -431,12 +490,55 @@
             if (regionId) {
                 url.searchParams.set('region_id', regionId);
             }
-            
-            // その他のUTMパラメータも転送
-            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(param => {
-                const value = currentUrl.searchParams.get(param);
+
+            // デバイス判定
+            function detectDevice() {
+                const userAgent = navigator.userAgent.toLowerCase();
+                if (userAgent.includes('mobile') || userAgent.includes('android') || userAgent.includes('iphone')) {
+                    return 'm'; // mobile
+                } else if (userAgent.includes('tablet') || userAgent.includes('ipad')) {
+                    return 't'; // tablet
+                } else {
+                    return 'c'; // computer/desktop
+                }
+            }
+
+            // UTMパラメータのデフォルト値設定（utm_creativeはparam2で個別処理）
+            const utmDefaults = {
+                'utm_source': 'google',
+                'utm_medium': 'cpc',
+                'utm_campaign': '{campaignid}',
+                'utm_term': '{keyword}'
+            };
+
+            // デバイスパラメータを設定
+            const deviceType = detectDevice();
+            url.searchParams.set('device', deviceType);
+            console.log('📱 device設定:', deviceType);
+
+            // UTMパラメータを設定（統合取得関数使用）
+            Object.entries(utmDefaults).forEach(([param, defaultValue]) => {
+                const urlValue = getOriginalParam(param);
+                const finalValue = urlValue || defaultValue;
+                url.searchParams.set(param, finalValue);
+                console.log(`🏷️ ${param}設定:`, finalValue, urlValue ? '(元URLパラメータ由来)' : '(デフォルト)');
+            });
+
+            // utm_creativeを個別に設定（param2で設定済みの値があれば優先、なければデフォルト）
+            if (utmCreative) {
+                url.searchParams.set('utm_creative', utmCreative);
+                console.log('🏷️ utm_creative設定:', utmCreative, '(元ページURL由来)');
+            } else {
+                url.searchParams.set('utm_creative', '{creative}');
+                console.log('🏷️ utm_creative設定: {creative} (デフォルト)');
+            }
+
+            // その他のUTMパラメータも転送（utm_content等）
+            ['utm_content'].forEach(param => {
+                const value = originalUrl.searchParams.get(param);
                 if (value) {
                     url.searchParams.set(param, value);
+                    console.log(`🏷️ ${param}設定:`, value, '(元ページURL由来)');
                 }
             });
             

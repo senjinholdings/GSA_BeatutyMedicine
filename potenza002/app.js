@@ -290,7 +290,7 @@ class DisplayManager {
             // バナー画像をclinic-texts.jsonから取得
             const imagesPath = window.SITE_CONFIG ? window.SITE_CONFIG.imagesPath + '/images' : '/images';
             const clinicCodeForImage = window.dataManager.getClinicCodeById(clinic.id);
-            let bannerImage = `${imagesPath}/clinics/dio/dio-logo.webp`; // デフォルト
+            let bannerImage = `../common_data/images/clinics/tcb/tcb-logo.webp`; // デフォルト
             
             if (clinicCodeForImage) {
                 // clinic-texts.jsonからパスを取得
@@ -299,7 +299,7 @@ class DisplayManager {
                     bannerImage = imagePath;
                 } else {
                     // フォールバック：コードベースのパス
-                    bannerImage = `${imagesPath}/clinics/${clinicCodeForImage}/${clinicCodeForImage}-logo.webp`;
+                    bannerImage = `../common_data/images/clinics/${clinicCodeForImage}/${clinicCodeForImage}-logo.webp`;
                 }
             }
 
@@ -970,17 +970,16 @@ class DataManager {
         // クリニックコードからクリニック名を取得
         // コードマッピング（clinic-texts.jsonの実際のクリニックコードに合わせて修正）
         const codeToNameMap = {
-            'omt': 'Oh my teeth',
-            'Oh my teeth': 'Oh my teeth',  // 直接名前が来た場合もサポート
-            'zenyum': 'ゼニュム',
-            'ゼニュム': 'ゼニュム',
-            'kireiline': 'キレイライン矯正',  // 正しいコードに修正
-            'キレイライン矯正': 'キレイライン矯正',
-            'ws': 'ウィスマイル',
-            'ウィスマイル': 'ウィスマイル',
-            'wesmile': 'ウィスマイル',  // 追加：別のコード形式
-            'invisalign': 'インビザライン',  // 正しいコードに修正
-            'インビザライン': 'インビザライン'
+            'tcb': 'TCB',  // ← 正しいクリニックコードに修正
+            'TCB': 'TCB',
+            'luna': 'LUNAビューティークリニック',
+            'LUNAビューティークリニック': 'LUNAビューティークリニック',
+            'rize': 'リゼクリニック',
+            'リゼクリニック': 'リゼクリニック',
+            'shinagawa': '品川美容外科',
+            '品川美容外科': '品川美容外科',
+            'seishin': '聖心美容クリニック',
+            '聖心美容クリニック': '聖心美容クリニック'
         };
         
         // まずマッピングをチェック
@@ -1057,8 +1056,8 @@ class DataManager {
         
         // 通いやすさタブの口コミ（3つ）
         for (let i = 1; i <= 3; i++) {
-            const title = this.getClinicText(clinicCode, `口コミ${i}タイトル（通いやすさ）`, '');
-            const content = this.getClinicText(clinicCode, `口コミ${i}内容（通いやすさ）`, '');
+            const title = this.getClinicText(clinicCode, `口コミ${i}タイトル（スタッフ）`, '');
+            const content = this.getClinicText(clinicCode, `口コミ${i}内容（スタッフ）`, '');
             if (title && content) {
                 reviews.access.push({ title, content });
             }
@@ -1066,8 +1065,8 @@ class DataManager {
         
         // スタッフタブの口コミ（3つ）
         for (let i = 1; i <= 3; i++) {
-            const title = this.getClinicText(clinicCode, `口コミ${i}タイトル（スタッフ）`, '');
-            const content = this.getClinicText(clinicCode, `口コミ${i}内容（スタッフ）`, '');
+            const title = this.getClinicText(clinicCode, `口コミ${i}タイトル（サービス）`, '');
+            const content = this.getClinicText(clinicCode, `口コミ${i}内容（サービス）`, '');
             if (title && content) {
                 reviews.staff.push({ title, content });
             }
@@ -1455,59 +1454,6 @@ class DataManager {
             return '000';
         }
         
-        // 地域コード別のマッピング（ランキングデータがない地域用）
-        const regionMapping = {
-            // 北海道・東北
-            '001': '013', // 北海道 → 東京
-            '002': '013', // 青森 → 東京
-            '003': '013', // 岩手 → 東京
-            '004': '013', // 宮城 → 東京
-            '005': '013', // 秋田 → 東京
-            '006': '013', // 山形 → 東京
-            '007': '013', // 福島 → 東京
-            
-            // 関東（存在しないもの）
-            '008': '013', // 茨城 → 東京
-            '009': '013', // 栃木 → 東京
-            '010': '013', // 群馬 → 東京
-            '015': '013', // 新潟 → 東京
-            
-            // 中部
-            '016': '023', // 富山 → 愛知
-            '017': '023', // 石川 → 愛知
-            '018': '023', // 福井 → 愛知
-            '019': '023', // 山梨 → 愛知
-            '020': '023', // 長野 → 愛知
-            '021': '023', // 岐阜 → 愛知
-            '022': '023', // 静岡 → 愛知
-            
-            // 関西
-            '024': '027', // 三重 → 大阪
-            '025': '027', // 滋賀 → 大阪
-            '026': '027', // 京都 → 大阪
-            '029': '027', // 奈良 → 大阪
-            '030': '027', // 和歌山 → 大阪
-            
-            // 中国・四国
-            '031': '027', // 鳥取 → 大阪
-            '032': '027', // 島根 → 大阪
-            '033': '028', // 岡山 → 兵庫
-            '034': '028', // 広島 → 兵庫
-            '035': '028', // 山口 → 兵庫
-            '036': '027', // 徳島 → 大阪
-            '037': '027', // 香川 → 大阪
-            '038': '027', // 愛媛 → 大阪
-            '039': '027', // 高知 → 大阪
-            
-            // 九州・沖縄
-            '041': '040', // 佐賀 → 福岡
-            '042': '040', // 長崎 → 福岡
-            '043': '040', // 熊本 → 福岡
-            '044': '040', // 大分 → 福岡
-            '045': '040', // 宮崎 → 福岡
-            '046': '040', // 鹿児島 → 福岡
-            '047': '040', // 沖縄 → 福岡
-        };
         
         // マッピングが存在する場合
         if (regionMapping[paddedRegionId]) {
@@ -1528,9 +1474,7 @@ class DataManager {
         // 全国版（000）の場合は東京（013）のランキングを使用
         // 北海道（001）の場合も東京（013）にフォールバック
         let targetRegionId = mappedRegionId;
-        if (mappedRegionId === '000' || mappedRegionId === '001') {
-            targetRegionId = '013';
-        }
+
         
         // データ構造がオブジェクト形式なので直接参照
         const paddedRegionId = String(targetRegionId).padStart(3, '0');
@@ -1797,38 +1741,6 @@ class RankingApp {
             });
         }
 
-        // 地図アコーディオンの開閉制御 - モーダル表示に変更したため無効化
-        /*
-        document.addEventListener('click', function(e) {
-            if (e.target.matches('.map-toggle-btn') || e.target.closest('.map-toggle-btn')) {
-                const button = e.target.matches('.map-toggle-btn') ? e.target : e.target.closest('.map-toggle-btn');
-                const storeId = button.getAttribute('data-store-id');
-                const mapElement = document.getElementById(`map-${storeId}`);
-                
-                if (mapElement) {
-                    if (mapElement.style.display === 'none' || mapElement.style.display === '') {
-                        mapElement.style.display = 'block';
-                        button.classList.add('active');
-                    } else {
-                        mapElement.style.display = 'none';
-                        button.classList.remove('active');
-                    }
-                }
-                e.preventDefault();
-            }
-        });
-        */
-
-        // ブラウザの戻る/進むボタン対応（region_idは使用しない）
-        /*
-        window.addEventListener('popstate', () => {
-            const regionId = this.urlHandler.getRegionId();
-            if (regionId !== this.currentRegionId) {
-                this.updatePageContent(regionId);
-                this.displayManager.regionSelect.value = regionId;
-            }
-        });
-        */
     }
 
     changeRegion(regionId) {
@@ -2324,9 +2236,9 @@ class RankingApp {
             // タブタイトルの更新
             const tabTexts = document.querySelectorAll('.tips-container .tab-text');
             if (tabTexts.length >= 3) {
-                tabTexts[0].textContent = this.dataManager.getCommonText('Tipsタブ1タイトル', '脂肪冷却の効果');
-                tabTexts[1].textContent = this.dataManager.getCommonText('Tipsタブ2タイトル', 'クリニック選び');
-                tabTexts[2].textContent = this.dataManager.getCommonText('Tipsタブ3タイトル', '今がおすすめ');
+                tabTexts[0].textContent = this.dataManager.getCommonText('Tipsタブ1タイトル', '効果');
+                tabTexts[1].textContent = this.dataManager.getCommonText('Tipsタブ2タイトル', '選び方');
+                tabTexts[2].textContent = this.dataManager.getCommonText('Tipsタブ3タイトル', 'おすすめ');
             }
             
             // Tips内容の更新（タブコンテンツ内のp要素）
@@ -2334,19 +2246,19 @@ class RankingApp {
             if (tabContents.length >= 3) {
                 const tips1P = tabContents[0].querySelector('p');
                 if (tips1P) {
-                    const tips1Content = this.dataManager.getCommonText('Tips1内容', '本気で痩せたいなら脂肪冷却が最短！科学的根拠に基づき、脂肪細胞そのものを凍結・減少させる痩身治療です。リバウンドしにくく、部分痩せも可能。自己流ダイエットで失敗続きの方にこそ試してほしい、確実な痩身方法です。');
+                    const tips1Content = this.dataManager.getCommonText('Tips1内容', '');
                     tips1P.innerHTML = this.dataManager.processDecoTags(tips1Content);
                 }
                 
                 const tips2P = tabContents[1].querySelector('p');
                 if (tips2P) {
-                    const tips2Content = this.dataManager.getCommonText('Tips2内容', 'クリニック選びの失敗が理想の体型実現の失敗につながります。<br>強引な勧誘は危険信号。次の3条件を満たす医院を選びましょう。<br><br>☑️医師が直接診察する<br>☑️施術後のアフターケア<br>☑️料金を明確に説明する');
+                    const tips2Content = this.dataManager.getCommonText('Tips2内容', '');
                     tips2P.innerHTML = this.dataManager.processDecoTags(tips2Content);
                 }
                 
                 const tips3P = tabContents[2].querySelector('p');
                 if (tips3P) {
-                    const tips3Content = this.dataManager.getCommonText('Tips3内容', '夏本番になると予約が取りにくくなり、料金も高くなりがち。今なら夏直前キャンペーンでお得に始められて、予約もスムーズ！理想の体型で夏を迎えるなら今がラストチャンスです。');
+                    const tips3Content = this.dataManager.getCommonText('Tips3内容', '');
                     tips3P.innerHTML = this.dataManager.processDecoTags(tips3Content);
                 }
             }
@@ -2365,17 +2277,6 @@ class RankingApp {
                     }
                 }
             }
-
-            // 比較表ヘッダーの更新（食事指導を対応部位に変更）
-            const tableHeaders = document.querySelectorAll('.comparison-table th');
-            tableHeaders.forEach(th => {
-                if (th.textContent.includes('食事指導')) {
-                    th.textContent = '対応部位';
-                    th.style.display = ''; // 表示する
-                    th.classList.remove('th-none');
-                }
-            });
-
             // （ヘッダー名の動的変更は行わない）
 
         } catch (error) {
@@ -2431,18 +2332,18 @@ class RankingApp {
         // ヘッダーを動的に生成
         // 最初の「クリニック」は固定、それ以降はheaderConfigから取得
         const headers = [
-            { key: null, default: 'クリニック', class: '', fixed: true },  // 固定項目
-            { key: '比較表ヘッダー1', default: '総合評価', class: '' },
-            { key: '比較表ヘッダー2', default: '費用', class: '' },
-            { key: '比較表ヘッダー3', default: '特徴', class: '' },
-            { key: '比較表ヘッダー10', default: '公式サイト', class: '' },
-            { key: '比較表ヘッダー4', default: '矯正範囲', class: 'th-none', style: 'display: none;' },
-            { key: '比較表ヘッダー5', default: '目安期間', class: 'th-none', style: 'display: none;' },
-            { key: '比較表ヘッダー6', default: '通院頻度', class: 'th-none', style: 'display: none;' },
-            { key: '比較表ヘッダー7', default: '実績/症例数', class: 'th-none', style: 'display: none;' },
-            { key: '比較表ヘッダー8', default: 'ワイヤー矯正の紹介', class: 'th-none', style: 'display: none;' },
-            { key: '比較表ヘッダー9', default: 'サポート', class: 'th-none', style: 'display: none;' },
-            { key: null, default: '詳細', class: 'th-none', style: 'display: none;', fixed: true }
+            { key: null, default: '', class: '', fixed: true },  // 固定項目
+            { key: '比較表ヘッダー1', default: '', class: '' },
+            { key: '比較表ヘッダー2', default: '', class: '' },
+            { key: '比較表ヘッダー3', default: '', class: '' },
+            { key: '比較表ヘッダー10', default: '', class: '' },
+            { key: '比較表ヘッダー4', default: '', class: 'th-none', style: 'display: none;' },
+            { key: '比較表ヘッダー5', default: '', class: 'th-none', style: 'display: none;' },
+            { key: '比較表ヘッダー6', default: '', class: 'th-none', style: 'display: none;' },
+            { key: '比較表ヘッダー7', default: '', class: 'th-none', style: 'display: none;' },
+            { key: '比較表ヘッダー8', default: '', class: 'th-none', style: 'display: none;' },
+            { key: '比較表ヘッダー9', default: '', class: 'th-none', style: 'display: none;' },
+            { key: null, default: '', class: 'th-none', style: 'display: none;', fixed: true }
         ];
         
         headers.forEach(header => {
@@ -2587,10 +2488,16 @@ class RankingApp {
                     // クリニック名とロゴ
                     const imagesPath = window.SITE_CONFIG ? window.SITE_CONFIG.imagesPath + '/images' : '/images';
                     let logoPath = this.dataManager.getClinicText(clinicCode, 'クリニックロゴ画像パス', '');
-                    
+
                     if (!logoPath) {
-                        const logoFolder = clinicCode === 'invisalign' ? 'invisalign' : clinicCode;
+                        // clinicCodeをそのままlogoFolderとして使用（invisalignの特別処理を削除）
+                        const logoFolder = clinicCode;
                         logoPath = `../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.webp`;
+
+                        // デバッグ用：画像パスの確認（ローカル環境のみ）
+                        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                            console.log(`比較表ロゴパス: clinicCode=${clinicCode}, logoFolder=${logoFolder}, logoPath=${logoPath}`);
+                        }
                     }
                     
                     const redirectUrl = `./redirect.html#clinic_id=${clinicId}&rank=${rankNum}&region_id=${regionId}`;
@@ -2643,21 +2550,6 @@ class RankingApp {
         this.setupDetailScrollLinks();
     }
     
-    // フィールド名からヘッダーキーを取得
-    getHeaderKeyForField(fieldName) {
-        const fieldToHeaderMap = {
-            '総合評価': '比較表ヘッダー1',
-            '費用': '比較表ヘッダー2', 
-            '特徴': '比較表ヘッダー3',
-            '矯正範囲': '比較表ヘッダー4',
-            '目安期間': '比較表ヘッダー5',
-            '通院頻度': '比較表ヘッダー6',
-            '実績/症例数': '比較表ヘッダー7',
-            'ワイヤー矯正の紹介': '比較表ヘッダー8',
-            'サポート': '比較表ヘッダー9'
-        };
-        return fieldToHeaderMap[fieldName] || null;
-    }
     
     // 現在表示されているクリニックのデータを取得
     getCurrentDisplayedClinics() {
@@ -2700,13 +2592,23 @@ class RankingApp {
         // この関数はフォールバック用なので、実際のデータがない場合のみ使用される
         // 実際のランキングはgetCurrentDisplayedClinicsで動的に取得される
         console.warn('フォールバックデータが使用されています。実際のランキングデータが取得できませんでした。');
-        return [
-            { id: '1', name: 'Oh my teeth', code: 'omt', rank: 1 },
-            { id: '2', name: 'インビザライン', code: 'invisalign', rank: 2 },
-            { id: '4', name: 'キレイライン矯正', code: 'kireiline', rank: 3 },
-            { id: '3', name: 'ウィスマイル', code: 'ws', rank: 4 },
-            { id: '5', name: 'ゼニュム', code: 'zenyum', rank: 5 }
-        ];
+
+        // items.csvで有効なクリニックのみを使用
+        if (window.dataManager && window.dataManager.clinics) {
+            const validClinics = window.dataManager.clinics.filter(clinic => {
+                // items.csvで有効とされているクリニックのみ
+                const validIds = ['1', '2', '3', '4', '5']; // TCB, LUNA, リゼ, 品川, 聖心
+                return validIds.includes(clinic.id);
+            });
+
+            return validClinics.slice(0, 5).map((clinic, index) => ({
+                ...clinic,
+                rank: index + 1
+            }));
+        }
+
+        // フォールバック：items.csvで有効なクリニックのみ
+      
     }
     
     // 星評価の初期化
@@ -2788,7 +2690,11 @@ class RankingApp {
         this.setupComparisonTabs();
         
         // 1位クリニックおすすめセクションを更新
-        this.updateFirstChoiceRecommendation(rankedClinics[0]);
+        // setupComparisonTabsの後に、現在表示されているクリニックから1位を取得
+        const displayedClinics = this.getCurrentDisplayedClinics();
+        if (displayedClinics && displayedClinics.length > 0) {
+            this.updateFirstChoiceRecommendation(displayedClinics[0]);
+        }
         
         // レビュータブ切り替え機能の設定
         this.setupReviewTabs();
@@ -2835,7 +2741,7 @@ class RankingApp {
             
             if (!logoPath) {
                 // フォールバック：コードベースのパス
-                const logoFolder = clinicCode === 'invisalign' ? 'invisalign' : clinicCode;
+                const logoFolder = clinicCode;
                 logoPath = `../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.webp`;
             }
             
@@ -2860,12 +2766,12 @@ class RankingApp {
                     <a class="link_btn" href="${this.urlHandler.getClinicUrlWithRegionId(clinic.id, clinic.rank || rankNum)}" target="_blank">公式サイト &gt;</a><br>
                     <a class="detail_btn" href="#clinic${rankNum}">詳細をみる</a>
                 </td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('矯正範囲', ''))}</td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('目安期間', ''))}</td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('通院頻度', ''))}</td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('実績/症例数', ''))}</td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('ワイヤー矯正の紹介', ''))}</td>
-                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('サポート', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
+                <td class="th-none" style="display: none;">${this.dataManager.processDecoTags(getClinicData('', ''))}</td>
             `;
             
             tbody.appendChild(tr);
@@ -2918,7 +2824,6 @@ class RankingApp {
     updateFirstChoiceRecommendation(topClinic) {
         if (!topClinic) return;
         
-        
         const clinicCode = window.dataManager.getClinicCodeById(topClinic.id);
         if (!clinicCode) return;
         
@@ -2935,8 +2840,18 @@ class RankingApp {
         // バナー画像を更新
         const bannerImage = document.getElementById('first-choice-banner-image');
         if (bannerImage) {
-            const bannerPath = window.dataManager.getClinicText(clinicCode, 'クリニック詳細バナー画像パス', '') || 
+            const csvBannerPath = window.dataManager.getClinicText(clinicCode, '詳細バナー画像パス', '');
+            const bannerPath = csvBannerPath ||
                              `../common_data/images//clinics/${clinicCode}/${clinicCode}_detail_bnr.webp`;
+
+            console.log(`[DEBUG] Clinic: ${clinicCode}, CSV Banner Path: "${csvBannerPath}", Final Path: "${bannerPath}"`);
+
+            // 追加のデバッグ：すべてのバナー画像要素をチェック
+            const allBannerImages = document.querySelectorAll('img[src*="_detail_bnr"]');
+            allBannerImages.forEach((img, index) => {
+                console.log(`[DEBUG] Banner image ${index}: ${img.src}, class: ${img.className}`);
+            });
+
             bannerImage.src = bannerPath;
             bannerImage.alt = topClinic.name;
         }
@@ -2949,19 +2864,19 @@ class RankingApp {
         const point3Title = document.getElementById('point3-title');
         const point3Desc = document.getElementById('point3-description');
         
-        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1タイトル', '');
-        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント1詳細', '');
-        
-        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2タイトル', '');
-        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント2詳細', '');
-        
-        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3タイトル', '');
-        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'おすすめポイント3詳細', '');
+        if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1タイトル', '');
+        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1内容', '');
+
+        if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2タイトル', '');
+        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2内容', '');
+
+        if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3タイトル', '');
+        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3内容', '');
         
         // ロゴ画像を更新
         const infoLogo = document.getElementById('first-choice-info-logo');
         if (infoLogo) {
-            const logoFolder = clinicCode === 'invisalign' ? 'invisalign' : clinicCode;
+            const logoFolder = clinicCode;
             const logoPath = window.dataManager.getClinicText(clinicCode, 'クリニックロゴ画像パス', '') || 
                             `../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.webp`;
             infoLogo.src = logoPath;
@@ -2971,14 +2886,14 @@ class RankingApp {
         // キャンペーンテキストを更新
         const campaignText = document.getElementById('first-choice-campaign-text');
         if (campaignText) {
-            const campaign = window.dataManager.getClinicText(clinicCode, 'キャンペーン', '期間限定キャンペーン<br>12ヶ月分0円');
+            const campaign = window.dataManager.getClinicText(clinicCode, 'INFORMATIONキャンペーンテキスト', '');
             campaignText.innerHTML = campaign;
         }
         
         // 実績テキストを更新
         const achievementText = document.getElementById('first-choice-achievement-text');
         if (achievementText) {
-            const achievement = window.dataManager.getClinicText(clinicCode, 'INFORMATIONサブテキスト', '\\月額・総額がリーズナブルなクリニック/');
+            const achievement = window.dataManager.getClinicText(clinicCode, 'INFORMATIONサブテキスト', '');
             achievementText.textContent = achievement;
         }
         
@@ -2993,11 +2908,36 @@ class RankingApp {
         if (ctaLink) {
             ctaLink.href = this.urlHandler.getClinicUrlWithRegionId(topClinic.id, topClinic.rank || 1);
         }
+
+        // 公式サイトリンクを更新
+        const officialLink = document.querySelector('#first-choice-official-link a');
+        if (officialLink) {
+            // リダイレクトURLを使用（案件詳細セクションと同様）
+            officialLink.href = this.urlHandler.getClinicUrlWithRegionId(topClinic.id, topClinic.rank || 1);
+
+            // strongタグには公式サイトURLのテキストを設定
+            const strongElement = officialLink.querySelector('strong');
+            const officialUrl = window.dataManager.getClinicText(clinicCode, '公式サイトURL', '#');
+            if (strongElement) {
+                strongElement.textContent = officialUrl;
+            } else {
+                officialLink.textContent = officialUrl;
+            }
+        }
         
         // 免責事項のタイトルを更新
         const disclaimerTitle = document.getElementById('first-choice-disclaimer-title');
         if (disclaimerTitle) {
             disclaimerTitle.textContent = `${topClinic.name}の確認事項`;
+        }
+
+        // 免責事項の内容を更新
+        const disclaimerContent = document.getElementById('dio-campaign-first-choice-content');
+        if (disclaimerContent) {
+            const disclaimerText = window.dataManager.getClinicText(clinicCode, 'INFORMATION確認事項', '');
+            if (disclaimerText) {
+                disclaimerContent.innerHTML = `<div style="font-size: 9px; color: #777; line-height: 1.4;">${disclaimerText}</div>`;
+            }
         }
     }
 
@@ -3018,20 +2958,7 @@ class RankingApp {
             
             // ダミーデータ（実際のデータに置き換え）
             const ratings = { 1: 4.9, 2: 4.5, 3: 4.3, 4: 4.1, 5: 3.8 };
-            const achievements = { 
-                1: '全国100院以上',
-                2: '累計施術50万件',
-                3: '開院15年の実績',
-                4: '全国80院展開',
-                5: '医療脱毛専門10年'
-            };
-            const benefits = {
-                1: '初回限定50%OFF',
-                2: '学割・ペア割あり',
-                3: '全身脱毛20%割引',
-                4: 'モニター割引30%',
-                5: '平日限定プランあり'
-            };
+            
 
             row.innerHTML = `
                 <td>
@@ -3081,8 +3008,8 @@ class RankingApp {
                         </div>
                     </div>
                 </td>
-                <td>全身＋VIO脱毛</td>
-                <td>最新医療レーザー</td>
+                <td></td>
+                <td></td>
                 <td><i class="fas fa-circle feature-icon"></i></td>
                 <td>
                     <div class="cta-cell">
@@ -3572,7 +3499,7 @@ class RankingApp {
                             
                             const campaignHeader = this.dataManager.getClinicText(clinicCode, 'キャンペーンヘッダー', 'INFORMATION!');
                             const campaignDescription = this.dataManager.getClinicText(clinicCode, 'INFORMATIONキャンペーンテキスト', '');
-                            const campaignMicrocopy = this.dataManager.getClinicText(clinicCode, 'INFORMATIONサブテキスト', '＼月額・総額がリーズナブルなクリニック／');
+                            const campaignMicrocopy = this.dataManager.getClinicText(clinicCode, 'INFORMATIONサブテキスト', '');
                             const ctaText = this.dataManager.getClinicText(clinicCode, 'CTAボタンテキスト', `${clinic.name}の公式サイト`);
                             
                             const logoFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
@@ -3667,9 +3594,9 @@ class RankingApp {
             imgElement.src = `${imagesPath}/clinics/${clinicName}/${clinicName}_clinic/clinic_image_${paddedNumber}.${extensions[nextExtIndex]}`;
         } else {
             // 全て失敗した場合、ロゴ画像にフォールバック
-            imgElement.src = `${imagesPath}/clinics/${clinicName}/${clinicName}-logo.webp`;
+            imgElement.src = `../common_data/images/clinics/${clinicName}/${clinicName}-logo.webp`;
             imgElement.onerror = () => {
-                imgElement.src = `${imagesPath}/clinics/${clinicName}/${clinicName}-logo.jpg`;
+                imgElement.src = `../common_data/images/clinics/${clinicName}/${clinicName}-logo.jpg`;
             };
         }
     }
@@ -3918,27 +3845,6 @@ class RankingApp {
             modalAddress.textContent = address;
             modalAccess.textContent = access;
             
-            // 営業時間を設定（クリニックごとに異なる場合は条件分岐を追加）
-            if (modalHours) {
-                // デフォルトの営業時間を設定
-                let hours = '11:00〜21:00';
-                
-                // クリニック名に基づいて営業時間を調整（必要に応じて）
-                if (clinicName.includes('DIO') || clinicName.includes('ディオ')) {
-                    hours = '11:00〜21:00';
-                } else if (clinicName.includes('エミナル')) {
-                    hours = '11:00〜21:00';
-                } else if (clinicName.includes('湘南')) {
-                    hours = '10:00〜19:00';
-                } else if (clinicName.includes('リエート')) {
-                    hours = '11:00〜20:00';
-                } else if (clinicName.includes('ウララ')) {
-                    hours = '11:00〜20:00';
-                }
-                
-                modalHours.textContent = hours;
-            }
-            
             // Google Maps iframeを生成
             modalMapContainer.innerHTML = this.generateMapIframe(address);
             
@@ -3958,21 +3864,6 @@ class RankingApp {
                 
                 if (clinic) {
                     clinicKey = clinic.code;
-                } else {
-                    // フォールバック：クリニック名から推測
-                    if (clinicName.includes('ディオ')) {
-                        clinicKey = 'dio';
-                    } else if (clinicName.includes('エミナル')) {
-                        clinicKey = 'eminal';
-                    } else if (clinicName.includes('湘南')) {
-                        clinicKey = 'sbc';
-                    } else if (clinicName.includes('リエート')) {
-                        clinicKey = 'lieto';
-                    } else if (clinicName.includes('ウララ')) {
-                        clinicKey = 'urara';
-                    } else if (clinicName.includes('DS')) {
-                        clinicKey = 'dsc';
-                    }
                 }
                 
                 // urlHandlerのインスタンスがある場合は使用、なければ直接URLを生成
@@ -4020,20 +3911,7 @@ class RankingApp {
                     const buttonText = document.getElementById('map-modal-button-text');
                     if (buttonText) {
                         // クリニック名を取得
-                        let clinicBaseName = '';
-                        if (clinicCode.includes('ディオ')) {
-                            clinicBaseName = 'ディオクリニック';
-                        } else if (clinicCode.includes('エミナル')) {
-                            clinicBaseName = 'エミナルクリニック';
-                        } else if (clinicCode.includes('湘南')) {
-                            clinicBaseName = '湘南美容クリニック';
-                        } else if (clinicCode.includes('リエート')) {
-                            clinicBaseName = 'リエートクリニック';
-                        } else if (clinicCode.includes('ウララ')) {
-                            clinicBaseName = 'ウララクリニック';
-                        } else {
-                            clinicBaseName = 'クリニック';
-                        }
+                        let clinicBaseName = clinicName || 'クリニック';
                         buttonText.textContent = clinicBaseName + 'の公式サイト';
                     }
                 } catch (error) {
@@ -4073,53 +3951,6 @@ function toggleStores(button) {
     // ボタンを非表示にする（一度クリックしたら消える）
     button.style.display = 'none';
 }
-
-// アプリケーションの起動（DOM読み込み完了後に実行）
-// 注: この部分は削除して、下の初期化コードに統合します
-/*
-document.addEventListener('DOMContentLoaded', () => {
-    const app = new RankingApp();
-    app.init();
-    
-    // Smooth scrolling for table of contents links
-    // Temporarily disabled for debugging scroll issues
-    
-    document.querySelectorAll('.toc-link').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const targetId = this.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                
-                window.scrollTo({
-                    top: targetPosition - 80,
-                    behavior: 'smooth'
-                });
-            }
-            
-            return false;
-        });
-    });
-    */
-    
-    // Prevent default behavior for all href="#" links
-    // This prevents page jumping to top
-    // Temporarily disabled for debugging - too broad impact with capture phase
-    /*
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a[href="#"]');
-        if (link) {
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        }
-    }, true);
-    */
-// });
 
 // アプリケーションの初期化
 // 比較表の注釈を動的に生成する関数
