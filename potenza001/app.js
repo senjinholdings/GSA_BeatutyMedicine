@@ -3911,7 +3911,7 @@ class RankingApp {
                     const buttonText = document.getElementById('map-modal-button-text');
                     if (buttonText) {
                         // クリニック名を取得
-                        let clinicBaseName = '';
+                        let clinicBaseName = clinicName || 'クリニック';
                         buttonText.textContent = clinicBaseName + 'の公式サイト';
                     }
                 } catch (error) {
