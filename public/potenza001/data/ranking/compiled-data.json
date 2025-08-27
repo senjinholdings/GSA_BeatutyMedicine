@@ -5707,1397 +5707,8 @@
     }
   },
   "storeViews": {
-    "0": {
-      "tcb_stores": [
-        "tcb_001",
-        "tcb_002",
-        "tcb_003",
-        "tcb_004",
-        "tcb_005",
-        "tcb_006",
-        "tcb_007",
-        "tcb_008",
-        "tcb_009",
-        "tcb_010",
-        "tcb_011",
-        "tcb_012",
-        "tcb_013",
-        "tcb_014",
-        "tcb_015",
-        "tcb_016",
-        "tcb_017",
-        "tcb_018",
-        "tcb_019",
-        "tcb_020",
-        "tcb_021",
-        "tcb_022",
-        "tcb_023",
-        "tcb_024",
-        "tcb_025",
-        "tcb_026",
-        "tcb_027",
-        "tcb_028",
-        "tcb_029",
-        "tcb_030",
-        "tcb_031",
-        "tcb_032",
-        "tcb_033",
-        "tcb_034",
-        "tcb_035",
-        "tcb_036",
-        "tcb_037",
-        "tcb_038",
-        "tcb_039",
-        "tcb_040",
-        "tcb_041",
-        "tcb_042",
-        "tcb_043",
-        "tcb_044",
-        "tcb_045",
-        "tcb_046",
-        "tcb_047",
-        "tcb_048",
-        "tcb_049",
-        "tcb_050",
-        "tcb_051",
-        "tcb_052",
-        "tcb_053",
-        "tcb_054",
-        "tcb_055",
-        "tcb_056",
-        "tcb_057",
-        "tcb_058",
-        "tcb_059",
-        "tcb_060",
-        "tcb_061",
-        "tcb_062",
-        "tcb_063",
-        "tcb_064",
-        "tcb_065",
-        "tcb_066",
-        "tcb_067",
-        "tcb_068",
-        "tcb_069",
-        "tcb_070",
-        "tcb_071",
-        "tcb_072",
-        "tcb_073",
-        "tcb_074",
-        "tcb_075",
-        "tcb_076",
-        "tcb_077",
-        "tcb_078",
-        "tcb_079",
-        "tcb_080",
-        "tcb_081",
-        "tcb_082",
-        "tcb_083",
-        "tcb_084",
-        "tcb_085",
-        "tcb_086",
-        "tcb_087",
-        "tcb_088",
-        "tcb_089",
-        "tcb_090",
-        "tcb_091",
-        "tcb_092",
-        "tcb_093",
-        "tcb_094",
-        "tcb_095",
-        "tcb_096",
-        "tcb_097",
-        "tcb_098",
-        "tcb_099",
-        "tcb_100",
-        "tcb_101",
-        "tcb_102",
-        "tcb_103",
-        "tcb_104",
-        "tcb_105"
-      ],
-      "luna_stores": [
-        "luna_001",
-        "luna_002"
-      ],
-      "rize_stores": [
-        "rize_001",
-        "rize_002",
-        "rize_003",
-        "rize_004",
-        "rize_005",
-        "rize_006",
-        "rize_007",
-        "rize_008",
-        "rize_009",
-        "rize_010",
-        "rize_011",
-        "rize_012",
-        "rize_013",
-        "rize_014",
-        "rize_015",
-        "rize_016",
-        "rize_017",
-        "rize_018",
-        "rize_019"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_001",
-        "shinagawa_002",
-        "shinagawa_003",
-        "shinagawa_004",
-        "shinagawa_005",
-        "shinagawa_006",
-        "shinagawa_007",
-        "shinagawa_008",
-        "shinagawa_009",
-        "shinagawa_010",
-        "shinagawa_011",
-        "shinagawa_012",
-        "shinagawa_013",
-        "shinagawa_014",
-        "shinagawa_015",
-        "shinagawa_016",
-        "shinagawa_017",
-        "shinagawa_018",
-        "shinagawa_019",
-        "shinagawa_020",
-        "shinagawa_021",
-        "shinagawa_022",
-        "shinagawa_023",
-        "shinagawa_024",
-        "shinagawa_025",
-        "shinagawa_026",
-        "shinagawa_027",
-        "shinagawa_028",
-        "shinagawa_029",
-        "shinagawa_030",
-        "shinagawa_031",
-        "shinagawa_032",
-        "shinagawa_033",
-        "shinagawa_034",
-        "shinagawa_035",
-        "shinagawa_036",
-        "shinagawa_037",
-        "shinagawa_038",
-        "shinagawa_039"
-      ],
-      "seishin_stores": [
-        "seishin_001",
-        "seishin_002",
-        "seishin_003",
-        "seishin_004",
-        "seishin_005",
-        "seishin_006",
-        "seishin_007",
-        "seishin_008",
-        "seishin_009",
-        "seishin_010"
-      ]
-    },
-    "1": {
-      "tcb_stores": [
-        "tcb_040",
-        "tcb_041",
-        "tcb_042"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_001"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_022"
-      ],
-      "seishin_stores": [
-        "seishin_001"
-      ]
-    },
-    "2": {
-      "tcb_stores": [
-        "tcb_046"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "3": {
-      "tcb_stores": [
-        "tcb_047"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "4": {
-      "tcb_stores": [
-        "tcb_043"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_002"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_023"
-      ],
-      "seishin_stores": []
-    },
-    "5": {
-      "tcb_stores": [
-        "tcb_049"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "6": {
-      "tcb_stores": [
-        "tcb_048"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "7": {
-      "tcb_stores": [
-        "tcb_044",
-        "tcb_045"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "8": {
-      "tcb_stores": [
-        "tcb_031",
-        "tcb_032"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "9": {
-      "tcb_stores": [
-        "tcb_030"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_020"
-      ],
-      "seishin_stores": []
-    },
-    "10": {
-      "tcb_stores": [
-        "tcb_038",
-        "tcb_039"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "11": {
-      "tcb_stores": [
-        "tcb_025",
-        "tcb_026",
-        "tcb_027",
-        "tcb_028",
-        "tcb_029"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_003"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_018",
-        "shinagawa_019"
-      ],
-      "seishin_stores": [
-        "seishin_004"
-      ]
-    },
-    "12": {
-      "tcb_stores": [
-        "tcb_033",
-        "tcb_034",
-        "tcb_035",
-        "tcb_036",
-        "tcb_037"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_004"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_021"
-      ],
-      "seishin_stores": []
-    },
-    "13": {
-      "tcb_stores": [
-        "tcb_001",
-        "tcb_002",
-        "tcb_003",
-        "tcb_004",
-        "tcb_005",
-        "tcb_006",
-        "tcb_007",
-        "tcb_008",
-        "tcb_009",
-        "tcb_010",
-        "tcb_011",
-        "tcb_012",
-        "tcb_013",
-        "tcb_014",
-        "tcb_015",
-        "tcb_016",
-        "tcb_017",
-        "tcb_018"
-      ],
-      "luna_stores": [
-        "luna_001",
-        "luna_002"
-      ],
-      "rize_stores": [
-        "rize_005",
-        "rize_006",
-        "rize_007",
-        "rize_008",
-        "rize_009"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_001",
-        "shinagawa_002",
-        "shinagawa_003",
-        "shinagawa_004",
-        "shinagawa_005",
-        "shinagawa_006",
-        "shinagawa_007",
-        "shinagawa_008",
-        "shinagawa_009",
-        "shinagawa_010",
-        "shinagawa_011",
-        "shinagawa_012",
-        "shinagawa_013",
-        "shinagawa_014",
-        "shinagawa_015"
-      ],
-      "seishin_stores": [
-        "seishin_002",
-        "seishin_003"
-      ]
-    },
-    "14": {
-      "tcb_stores": [
-        "tcb_019",
-        "tcb_020",
-        "tcb_021",
-        "tcb_022",
-        "tcb_023",
-        "tcb_024"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_010"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_016",
-        "shinagawa_017"
-      ],
-      "seishin_stores": [
-        "seishin_005"
-      ]
-    },
-    "15": {
-      "tcb_stores": [
-        "tcb_062"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_011"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_024"
-      ],
-      "seishin_stores": []
-    },
-    "16": {
-      "tcb_stores": [
-        "tcb_064"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "17": {
-      "tcb_stores": [
-        "tcb_061"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "18": {
-      "tcb_stores": [
-        "tcb_065"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "19": {
-      "tcb_stores": [
-        "tcb_066"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "20": {
-      "tcb_stores": [
-        "tcb_059",
-        "tcb_060"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "21": {
-      "tcb_stores": [
-        "tcb_055"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "22": {
-      "tcb_stores": [
-        "tcb_056",
-        "tcb_057",
-        "tcb_058"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_027"
-      ],
-      "seishin_stores": [
-        "seishin_006"
-      ]
-    },
-    "23": {
-      "tcb_stores": [
-        "tcb_050",
-        "tcb_051",
-        "tcb_052",
-        "tcb_053",
-        "tcb_054"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_012",
-        "rize_013"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_025",
-        "shinagawa_026"
-      ],
-      "seishin_stores": [
-        "seishin_007"
-      ]
-    },
-    "24": {
-      "tcb_stores": [
-        "tcb_063"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "25": {
-      "tcb_stores": [
-        "tcb_083"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "26": {
-      "tcb_stores": [
-        "tcb_077",
-        "tcb_078"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_014"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_031"
-      ],
-      "seishin_stores": []
-    },
-    "27": {
-      "tcb_stores": [
-        "tcb_067",
-        "tcb_068",
-        "tcb_069",
-        "tcb_070",
-        "tcb_071",
-        "tcb_072",
-        "tcb_073",
-        "tcb_074",
-        "tcb_075",
-        "tcb_076"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_015",
-        "rize_016"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_028",
-        "shinagawa_029",
-        "shinagawa_030"
-      ],
-      "seishin_stores": [
-        "seishin_008"
-      ]
-    },
-    "28": {
-      "tcb_stores": [
-        "tcb_079",
-        "tcb_080"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_017"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_032"
-      ],
-      "seishin_stores": []
-    },
-    "29": {
-      "tcb_stores": [
-        "tcb_081"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "30": {
-      "tcb_stores": [
-        "tcb_082"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "31": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "32": {
-      "tcb_stores": [
-        "tcb_088"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "33": {
-      "tcb_stores": [
-        "tcb_084",
-        "tcb_085"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_033"
-      ],
-      "seishin_stores": []
-    },
-    "34": {
-      "tcb_stores": [
-        "tcb_086",
-        "tcb_087"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_018"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_034"
-      ],
-      "seishin_stores": [
-        "seishin_009"
-      ]
-    },
-    "35": {
-      "tcb_stores": [
-        "tcb_089"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "36": {
-      "tcb_stores": [
-        "tcb_093"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "37": {
-      "tcb_stores": [
-        "tcb_090"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "38": {
-      "tcb_stores": [
-        "tcb_091"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "39": {
-      "tcb_stores": [
-        "tcb_092"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "40": {
-      "tcb_stores": [
-        "tcb_094",
-        "tcb_095",
-        "tcb_096",
-        "tcb_097",
-        "tcb_098"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_019"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_035",
-        "shinagawa_036"
-      ],
-      "seishin_stores": [
-        "seishin_010"
-      ]
-    },
-    "41": {
-      "tcb_stores": [
-        "tcb_103"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "42": {
-      "tcb_stores": [
-        "tcb_102"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "43": {
-      "tcb_stores": [
-        "tcb_100"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_038"
-      ],
-      "seishin_stores": []
-    },
-    "44": {
-      "tcb_stores": [
-        "tcb_104"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "45": {
-      "tcb_stores": [
-        "tcb_101"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "46": {
-      "tcb_stores": [
-        "tcb_099"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_037"
-      ],
-      "seishin_stores": []
-    },
-    "47": {
-      "tcb_stores": [
-        "tcb_105"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_039"
-      ],
-      "seishin_stores": []
-    },
-    "48": {
-      "tcb_stores": [
-        "tcb_005"
-      ],
-      "luna_stores": [
-        "luna_002"
-      ],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_008",
-        "shinagawa_009"
-      ],
-      "seishin_stores": []
-    },
-    "49": {
-      "tcb_stores": [
-        "tcb_008",
-        "tcb_013"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_012",
-        "shinagawa_013"
-      ],
-      "seishin_stores": []
-    },
-    "50": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "51": {
-      "tcb_stores": [
-        "tcb_009"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_006"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_005",
-        "shinagawa_006",
-        "shinagawa_007"
-      ],
-      "seishin_stores": []
-    },
-    "52": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "53": {
-      "tcb_stores": [
-        "tcb_006",
-        "tcb_007"
-      ],
-      "luna_stores": [
-        "luna_001"
-      ],
-      "rize_stores": [
-        "rize_007"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_010",
-        "shinagawa_011"
-      ],
-      "seishin_stores": [
-        "seishin_003"
-      ]
-    },
-    "54": {
-      "tcb_stores": [
-        "tcb_017"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "55": {
-      "tcb_stores": [
-        "tcb_016"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_001",
-        "shinagawa_002"
-      ],
-      "seishin_stores": []
-    },
-    "56": {
-      "tcb_stores": [
-        "tcb_009",
-        "tcb_010"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_006"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_005",
-        "shinagawa_006",
-        "shinagawa_007"
-      ],
-      "seishin_stores": []
-    },
-    "57": {
-      "tcb_stores": [
-        "tcb_001",
-        "tcb_002",
-        "tcb_003"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_005"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_003",
-        "shinagawa_004"
-      ],
-      "seishin_stores": []
-    },
-    "58": {
-      "tcb_stores": [
-        "tcb_014"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_008"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_014"
-      ],
-      "seishin_stores": []
-    },
-    "59": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "60": {
-      "tcb_stores": [
-        "tcb_012"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_009"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_015"
-      ],
-      "seishin_stores": []
-    },
-    "61": {
-      "tcb_stores": [
-        "tcb_002",
-        "tcb_004"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_008",
-        "shinagawa_009"
-      ],
-      "seishin_stores": []
-    },
-    "62": {
-      "tcb_stores": [
-        "tcb_006",
-        "tcb_007"
-      ],
-      "luna_stores": [
-        "luna_001"
-      ],
-      "rize_stores": [
-        "rize_007"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_010",
-        "shinagawa_011"
-      ],
-      "seishin_stores": [
-        "seishin_003"
-      ]
-    },
-    "63": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "64": {
-      "tcb_stores": [
-        "tcb_008",
-        "tcb_013"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_012",
-        "shinagawa_013"
-      ],
-      "seishin_stores": []
-    },
-    "65": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_005",
-        "shinagawa_006"
-      ],
-      "seishin_stores": []
-    },
-    "66": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_007"
-      ],
-      "seishin_stores": []
-    },
-    "67": {
-      "tcb_stores": [
-        "tcb_006",
-        "tcb_007"
-      ],
-      "luna_stores": [
-        "luna_001"
-      ],
-      "rize_stores": [
-        "rize_007"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_010",
-        "shinagawa_011"
-      ],
-      "seishin_stores": [
-        "seishin_003"
-      ]
-    },
-    "68": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": [
-        "seishin_002"
-      ]
-    },
-    "69": {
-      "tcb_stores": [
-        "tcb_008",
-        "tcb_013"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [
-        "shinagawa_012",
-        "shinagawa_013"
-      ],
-      "seishin_stores": []
-    },
-    "70": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "71": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "72": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "73": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "74": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "75": {
-      "tcb_stores": [
-        "tcb_068",
-        "tcb_072"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_016"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_030"
-      ],
-      "seishin_stores": []
-    },
-    "76": {
-      "tcb_stores": [
-        "tcb_075"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "77": {
-      "tcb_stores": [
-        "tcb_068",
-        "tcb_069",
-        "tcb_072"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_016"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_030"
-      ],
-      "seishin_stores": []
-    },
-    "78": {
-      "tcb_stores": [
-        "tcb_068",
-        "tcb_072"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_016"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_030"
-      ],
-      "seishin_stores": []
-    },
-    "79": {
-      "tcb_stores": [
-        "tcb_067",
-        "tcb_070",
-        "tcb_071"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_015"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_028",
-        "shinagawa_029"
-      ],
-      "seishin_stores": [
-        "seishin_008"
-      ]
-    },
-    "80": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "81": {
-      "tcb_stores": [
-        "tcb_050",
-        "tcb_051"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_012",
-        "rize_013"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_025",
-        "shinagawa_026"
-      ],
-      "seishin_stores": []
-    },
-    "82": {
-      "tcb_stores": [
-        "tcb_053"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "83": {
-      "tcb_stores": [
-        "tcb_054"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "84": {
-      "tcb_stores": [
-        "tcb_050",
-        "tcb_051",
-        "tcb_052"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_012",
-        "rize_013"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_025",
-        "shinagawa_026"
-      ],
-      "seishin_stores": [
-        "seishin_007"
-      ]
-    },
-    "85": {
-      "tcb_stores": [
-        "tcb_097"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "86": {
-      "tcb_stores": [
-        "tcb_094",
-        "tcb_096",
-        "tcb_098"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_019"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_035",
-        "shinagawa_036"
-      ],
-      "seishin_stores": [
-        "seishin_010"
-      ]
-    },
-    "87": {
-      "tcb_stores": [
-        "tcb_094",
-        "tcb_096",
-        "tcb_098"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_019"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_035",
-        "shinagawa_036"
-      ],
-      "seishin_stores": [
-        "seishin_010"
-      ]
-    },
-    "88": {
-      "tcb_stores": [
-        "tcb_095"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "89": {
-      "tcb_stores": [
-        "tcb_042"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "90": {
-      "tcb_stores": [
-        "tcb_040",
-        "tcb_041"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_001"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_022"
-      ],
-      "seishin_stores": [
-        "seishin_001"
-      ]
-    },
-    "91": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "92": {
-      "tcb_stores": [
-        "tcb_079"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_017"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_032"
-      ],
-      "seishin_stores": []
-    },
-    "93": {
-      "tcb_stores": [
-        "tcb_079"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_017"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_032"
-      ],
-      "seishin_stores": []
-    },
-    "94": {
-      "tcb_stores": [],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "95": {
-      "tcb_stores": [
-        "tcb_080"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "96": {
-      "tcb_stores": [
-        "tcb_024"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "97": {
-      "tcb_stores": [
-        "tcb_022"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "98": {
-      "tcb_stores": [
-        "tcb_023"
-      ],
-      "luna_stores": [],
-      "rize_stores": [],
-      "shinagawa_stores": [],
-      "seishin_stores": []
-    },
-    "99": {
-      "tcb_stores": [
-        "tcb_010",
-        "tcb_018",
-        "tcb_022"
-      ],
-      "luna_stores": [],
-      "rize_stores": [
-        "rize_006"
-      ],
-      "shinagawa_stores": [
-        "shinagawa_005",
-        "shinagawa_006"
-      ],
-      "seishin_stores": []
-    },
     "100": {
       "tcb_stores": [
-        "tcb_018",
         "tcb_022"
       ],
       "luna_stores": [],
@@ -7107,8 +5718,7 @@
     },
     "101": {
       "tcb_stores": [
-        "tcb_019",
-        "tcb_020"
+        "tcb_019"
       ],
       "luna_stores": [],
       "rize_stores": [
@@ -7123,19 +5733,14 @@
       ]
     },
     "102": {
-      "tcb_stores": [
-        "tcb_023"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "103": {
-      "tcb_stores": [
-        "tcb_035",
-        "tcb_037"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [
         "rize_004"
@@ -7144,18 +5749,14 @@
       "seishin_stores": []
     },
     "104": {
-      "tcb_stores": [
-        "tcb_036"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "105": {
-      "tcb_stores": [
-        "tcb_037"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7167,9 +5768,7 @@
         "tcb_026"
       ],
       "luna_stores": [],
-      "rize_stores": [
-        "rize_003"
-      ],
+      "rize_stores": [],
       "shinagawa_stores": [
         "shinagawa_018",
         "shinagawa_019"
@@ -7184,9 +5783,7 @@
         "tcb_026"
       ],
       "luna_stores": [],
-      "rize_stores": [
-        "rize_003"
-      ],
+      "rize_stores": [],
       "shinagawa_stores": [
         "shinagawa_018",
         "shinagawa_019"
@@ -7196,31 +5793,21 @@
       ]
     },
     "108": {
-      "tcb_stores": [
-        "tcb_027"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "109": {
-      "tcb_stores": [
-        "tcb_017",
-        "tcb_027",
-        "tcb_029",
-        "tcb_037"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "110": {
-      "tcb_stores": [
-        "tcb_038",
-        "tcb_039"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7228,8 +5815,7 @@
     },
     "111": {
       "tcb_stores": [
-        "tcb_077",
-        "tcb_078"
+        "tcb_077"
       ],
       "luna_stores": [],
       "rize_stores": [
@@ -7241,9 +5827,7 @@
       "seishin_stores": []
     },
     "112": {
-      "tcb_stores": [
-        "tcb_091"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7257,18 +5841,14 @@
       "seishin_stores": []
     },
     "114": {
-      "tcb_stores": [
-        "tcb_061"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "115": {
-      "tcb_stores": [
-        "tcb_032"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7284,9 +5864,7 @@
       "seishin_stores": []
     },
     "117": {
-      "tcb_stores": [
-        "tcb_047"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7300,18 +5878,14 @@
       "seishin_stores": []
     },
     "119": {
-      "tcb_stores": [
-        "tcb_085"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "120": {
-      "tcb_stores": [
-        "tcb_090"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7325,36 +5899,28 @@
       "seishin_stores": []
     },
     "122": {
-      "tcb_stores": [
-        "tcb_058"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "123": {
-      "tcb_stores": [
-        "tcb_057"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "124": {
-      "tcb_stores": [
-        "tcb_058"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "125": {
-      "tcb_stores": [
-        "tcb_088"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7386,9 +5952,7 @@
       "seishin_stores": []
     },
     "129": {
-      "tcb_stores": [
-        "tcb_060"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7409,18 +5973,14 @@
       "seishin_stores": []
     },
     "132": {
-      "tcb_stores": [
-        "tcb_045"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
     },
     "133": {
-      "tcb_stores": [
-        "tcb_063"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -7434,9 +5994,7 @@
       "seishin_stores": []
     },
     "135": {
-      "tcb_stores": [
-        "tcb_063"
-      ],
+      "tcb_stores": [],
       "luna_stores": [],
       "rize_stores": [],
       "shinagawa_stores": [],
@@ -8602,10 +7160,1178 @@
       "rize_stores": [],
       "shinagawa_stores": [],
       "seishin_stores": []
+    },
+    "000": {
+      "tcb_stores": [
+        "tcb_001",
+        "tcb_002",
+        "tcb_003",
+        "tcb_004",
+        "tcb_005",
+        "tcb_006",
+        "tcb_009",
+        "tcb_010",
+        "tcb_012",
+        "tcb_014",
+        "tcb_019",
+        "tcb_022",
+        "tcb_025",
+        "tcb_026",
+        "tcb_030",
+        "tcb_031",
+        "tcb_032",
+        "tcb_033",
+        "tcb_040",
+        "tcb_042",
+        "tcb_043",
+        "tcb_050",
+        "tcb_051",
+        "tcb_056",
+        "tcb_067",
+        "tcb_069",
+        "tcb_070",
+        "tcb_071",
+        "tcb_077",
+        "tcb_079",
+        "tcb_086",
+        "tcb_094",
+        "tcb_095",
+        "tcb_096",
+        "tcb_098",
+        "tcb_100",
+        "tcb_105"
+      ],
+      "luna_stores": [
+        "luna_001",
+        "luna_002"
+      ],
+      "rize_stores": [
+        "rize_001",
+        "rize_002",
+        "rize_003",
+        "rize_004",
+        "rize_005",
+        "rize_006",
+        "rize_007",
+        "rize_008",
+        "rize_009",
+        "rize_010",
+        "rize_011",
+        "rize_012",
+        "rize_013",
+        "rize_014",
+        "rize_015",
+        "rize_016",
+        "rize_017",
+        "rize_018",
+        "rize_019"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_001",
+        "shinagawa_002",
+        "shinagawa_003",
+        "shinagawa_004",
+        "shinagawa_005",
+        "shinagawa_006",
+        "shinagawa_007",
+        "shinagawa_008",
+        "shinagawa_009",
+        "shinagawa_010",
+        "shinagawa_011",
+        "shinagawa_012",
+        "shinagawa_013",
+        "shinagawa_014",
+        "shinagawa_015",
+        "shinagawa_016",
+        "shinagawa_017",
+        "shinagawa_018",
+        "shinagawa_019",
+        "shinagawa_020",
+        "shinagawa_021",
+        "shinagawa_022",
+        "shinagawa_023",
+        "shinagawa_024",
+        "shinagawa_025",
+        "shinagawa_026",
+        "shinagawa_027",
+        "shinagawa_028",
+        "shinagawa_029",
+        "shinagawa_030",
+        "shinagawa_031",
+        "shinagawa_032",
+        "shinagawa_033",
+        "shinagawa_034",
+        "shinagawa_035",
+        "shinagawa_036",
+        "shinagawa_037",
+        "shinagawa_038",
+        "shinagawa_039"
+      ],
+      "seishin_stores": [
+        "seishin_001",
+        "seishin_002",
+        "seishin_003",
+        "seishin_004",
+        "seishin_005",
+        "seishin_006",
+        "seishin_007",
+        "seishin_008",
+        "seishin_009",
+        "seishin_010"
+      ]
+    },
+    "001": {
+      "tcb_stores": [
+        "tcb_040",
+        "tcb_042"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_001"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_022"
+      ],
+      "seishin_stores": [
+        "seishin_001"
+      ]
+    },
+    "002": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "003": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "004": {
+      "tcb_stores": [
+        "tcb_043"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_002"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_023"
+      ],
+      "seishin_stores": []
+    },
+    "005": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "006": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "007": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "008": {
+      "tcb_stores": [
+        "tcb_031",
+        "tcb_032"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "009": {
+      "tcb_stores": [
+        "tcb_030"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_020"
+      ],
+      "seishin_stores": []
+    },
+    "010": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "011": {
+      "tcb_stores": [
+        "tcb_025",
+        "tcb_026"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_003"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_018",
+        "shinagawa_019"
+      ],
+      "seishin_stores": [
+        "seishin_004"
+      ]
+    },
+    "012": {
+      "tcb_stores": [
+        "tcb_033"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_004"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_021"
+      ],
+      "seishin_stores": []
+    },
+    "013": {
+      "tcb_stores": [
+        "tcb_001",
+        "tcb_002",
+        "tcb_003",
+        "tcb_004",
+        "tcb_005",
+        "tcb_006",
+        "tcb_009",
+        "tcb_010",
+        "tcb_012",
+        "tcb_014"
+      ],
+      "luna_stores": [
+        "luna_001",
+        "luna_002"
+      ],
+      "rize_stores": [
+        "rize_005",
+        "rize_006",
+        "rize_007",
+        "rize_008",
+        "rize_009"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_001",
+        "shinagawa_002",
+        "shinagawa_003",
+        "shinagawa_004",
+        "shinagawa_005",
+        "shinagawa_006",
+        "shinagawa_007",
+        "shinagawa_008",
+        "shinagawa_009",
+        "shinagawa_010",
+        "shinagawa_011",
+        "shinagawa_012",
+        "shinagawa_013",
+        "shinagawa_014",
+        "shinagawa_015"
+      ],
+      "seishin_stores": [
+        "seishin_002",
+        "seishin_003"
+      ]
+    },
+    "014": {
+      "tcb_stores": [
+        "tcb_019",
+        "tcb_022"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_010"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_016",
+        "shinagawa_017"
+      ],
+      "seishin_stores": [
+        "seishin_005"
+      ]
+    },
+    "015": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_011"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_024"
+      ],
+      "seishin_stores": []
+    },
+    "016": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "017": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "018": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "019": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "020": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "021": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "022": {
+      "tcb_stores": [
+        "tcb_056"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_027"
+      ],
+      "seishin_stores": [
+        "seishin_006"
+      ]
+    },
+    "023": {
+      "tcb_stores": [
+        "tcb_050",
+        "tcb_051"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_012",
+        "rize_013"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_025",
+        "shinagawa_026"
+      ],
+      "seishin_stores": [
+        "seishin_007"
+      ]
+    },
+    "024": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "025": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "026": {
+      "tcb_stores": [
+        "tcb_077"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_014"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_031"
+      ],
+      "seishin_stores": []
+    },
+    "027": {
+      "tcb_stores": [
+        "tcb_067",
+        "tcb_069",
+        "tcb_070",
+        "tcb_071"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_015",
+        "rize_016"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_028",
+        "shinagawa_029",
+        "shinagawa_030"
+      ],
+      "seishin_stores": [
+        "seishin_008"
+      ]
+    },
+    "028": {
+      "tcb_stores": [
+        "tcb_079"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_017"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_032"
+      ],
+      "seishin_stores": []
+    },
+    "029": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "030": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "031": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "032": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "033": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_033"
+      ],
+      "seishin_stores": []
+    },
+    "034": {
+      "tcb_stores": [
+        "tcb_086"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_018"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_034"
+      ],
+      "seishin_stores": [
+        "seishin_009"
+      ]
+    },
+    "035": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "036": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "037": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "038": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "039": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "040": {
+      "tcb_stores": [
+        "tcb_094",
+        "tcb_095",
+        "tcb_096",
+        "tcb_098"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_019"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_035",
+        "shinagawa_036"
+      ],
+      "seishin_stores": [
+        "seishin_010"
+      ]
+    },
+    "041": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "042": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "043": {
+      "tcb_stores": [
+        "tcb_100"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_038"
+      ],
+      "seishin_stores": []
+    },
+    "044": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "045": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "046": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_037"
+      ],
+      "seishin_stores": []
+    },
+    "047": {
+      "tcb_stores": [
+        "tcb_105"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_039"
+      ],
+      "seishin_stores": []
+    },
+    "048": {
+      "tcb_stores": [
+        "tcb_005"
+      ],
+      "luna_stores": [
+        "luna_002"
+      ],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_008",
+        "shinagawa_009"
+      ],
+      "seishin_stores": []
+    },
+    "049": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_012",
+        "shinagawa_013"
+      ],
+      "seishin_stores": []
+    },
+    "050": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "051": {
+      "tcb_stores": [
+        "tcb_009"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_006"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_005",
+        "shinagawa_006",
+        "shinagawa_007"
+      ],
+      "seishin_stores": []
+    },
+    "052": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "053": {
+      "tcb_stores": [
+        "tcb_006"
+      ],
+      "luna_stores": [
+        "luna_001"
+      ],
+      "rize_stores": [
+        "rize_007"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_010",
+        "shinagawa_011"
+      ],
+      "seishin_stores": [
+        "seishin_003"
+      ]
+    },
+    "054": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "055": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_001",
+        "shinagawa_002"
+      ],
+      "seishin_stores": []
+    },
+    "056": {
+      "tcb_stores": [
+        "tcb_009",
+        "tcb_010"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_006"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_005",
+        "shinagawa_006",
+        "shinagawa_007"
+      ],
+      "seishin_stores": []
+    },
+    "057": {
+      "tcb_stores": [
+        "tcb_001",
+        "tcb_002",
+        "tcb_003"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_005"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_003",
+        "shinagawa_004"
+      ],
+      "seishin_stores": []
+    },
+    "058": {
+      "tcb_stores": [
+        "tcb_014"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_008"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_014"
+      ],
+      "seishin_stores": []
+    },
+    "059": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "060": {
+      "tcb_stores": [
+        "tcb_012"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_015"
+      ],
+      "seishin_stores": []
+    },
+    "061": {
+      "tcb_stores": [
+        "tcb_002",
+        "tcb_004"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_008",
+        "shinagawa_009"
+      ],
+      "seishin_stores": []
+    },
+    "062": {
+      "tcb_stores": [
+        "tcb_006"
+      ],
+      "luna_stores": [
+        "luna_001"
+      ],
+      "rize_stores": [
+        "rize_007"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_010",
+        "shinagawa_011"
+      ],
+      "seishin_stores": [
+        "seishin_003"
+      ]
+    },
+    "063": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "064": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_012",
+        "shinagawa_013"
+      ],
+      "seishin_stores": []
+    },
+    "065": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_005",
+        "shinagawa_006"
+      ],
+      "seishin_stores": []
+    },
+    "066": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_007"
+      ],
+      "seishin_stores": []
+    },
+    "067": {
+      "tcb_stores": [
+        "tcb_006"
+      ],
+      "luna_stores": [
+        "luna_001"
+      ],
+      "rize_stores": [
+        "rize_007"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_010",
+        "shinagawa_011"
+      ],
+      "seishin_stores": [
+        "seishin_003"
+      ]
+    },
+    "068": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": [
+        "seishin_002"
+      ]
+    },
+    "069": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [
+        "shinagawa_012",
+        "shinagawa_013"
+      ],
+      "seishin_stores": []
+    },
+    "070": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "071": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "072": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "073": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "074": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "075": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_016"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_030"
+      ],
+      "seishin_stores": []
+    },
+    "076": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "077": {
+      "tcb_stores": [
+        "tcb_069"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_016"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_030"
+      ],
+      "seishin_stores": []
+    },
+    "078": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_016"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_030"
+      ],
+      "seishin_stores": []
+    },
+    "079": {
+      "tcb_stores": [
+        "tcb_071"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_015"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_028",
+        "shinagawa_029"
+      ],
+      "seishin_stores": [
+        "seishin_008"
+      ]
+    },
+    "080": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "081": {
+      "tcb_stores": [
+        "tcb_050",
+        "tcb_051"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_012",
+        "rize_013"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_026"
+      ],
+      "seishin_stores": []
+    },
+    "082": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "083": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "084": {
+      "tcb_stores": [
+        "tcb_050",
+        "tcb_051"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_012",
+        "rize_013"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_026"
+      ],
+      "seishin_stores": [
+        "seishin_007"
+      ]
+    },
+    "085": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "086": {
+      "tcb_stores": [
+        "tcb_094",
+        "tcb_096",
+        "tcb_098"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_019"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_035",
+        "shinagawa_036"
+      ],
+      "seishin_stores": [
+        "seishin_010"
+      ]
+    },
+    "087": {
+      "tcb_stores": [
+        "tcb_094",
+        "tcb_096",
+        "tcb_098"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_019"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_035",
+        "shinagawa_036"
+      ],
+      "seishin_stores": [
+        "seishin_010"
+      ]
+    },
+    "088": {
+      "tcb_stores": [
+        "tcb_095"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "089": {
+      "tcb_stores": [
+        "tcb_042"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "090": {
+      "tcb_stores": [
+        "tcb_040"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_001"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_022"
+      ],
+      "seishin_stores": [
+        "seishin_001"
+      ]
+    },
+    "091": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "092": {
+      "tcb_stores": [
+        "tcb_079"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "093": {
+      "tcb_stores": [
+        "tcb_079"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "094": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "095": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "096": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "097": {
+      "tcb_stores": [
+        "tcb_022"
+      ],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "098": {
+      "tcb_stores": [],
+      "luna_stores": [],
+      "rize_stores": [],
+      "shinagawa_stores": [],
+      "seishin_stores": []
+    },
+    "099": {
+      "tcb_stores": [
+        "tcb_010",
+        "tcb_022"
+      ],
+      "luna_stores": [],
+      "rize_stores": [
+        "rize_006"
+      ],
+      "shinagawa_stores": [
+        "shinagawa_005",
+        "shinagawa_006"
+      ],
+      "seishin_stores": []
     }
   },
   "metadata": {
-    "lastUpdated": "2025-08-22T01:01:32.492Z",
+    "lastUpdated": "2025-08-27T08:00:22.704Z",
     "totalClinics": 20,
     "totalStores": 1209,
     "totalRegions": 301

@@ -1238,8 +1238,13 @@ class DataManager {
     
     // クリニックの店舗データを取得（地域別）
     getStoreDataForClinic(clinicCode, regionId) {
-        // store_viewから該当地域のデータを取得
-        const storeView = this.storeViews.find(sv => sv.regionId === regionId);
+        // 地域IDをマッピングして正規化（例: '13' -> '013'）
+        const mappedRegionId = this.mapRegionId(regionId);
+        let storeView = this.storeViews.find(sv => sv.regionId === mappedRegionId);
+        if (!storeView) {
+            const normalizedRegionId = String(parseInt(mappedRegionId, 10));
+            storeView = this.storeViews.find(sv => sv.regionId === normalizedRegionId);
+        }
         if (!storeView) return [];
         
         // ランキングデータを取得して、表示されているクリニックを特定
