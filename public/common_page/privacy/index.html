@@ -222,7 +222,7 @@
     <header>
         <div class="container">
             <div class="header-inner">
-                <a href="javascript:void(0)" onclick="history.back()" class="site-title">矯正歯科おすすめ比較.com</a>
+                <a href="javascript:void(0)" onclick="history.back()" class="site-title">おすすめ比較.com</a>
             </div>
         </div>
     </header>
@@ -270,9 +270,33 @@
                     <li><a href="/common_page/company/">運営者情報</a></li>
                     <li><a href="/common_page/disclaimer/">免責事項</a></li>
                 </ul>
-                <p class="copyright">&copy; 2025 矯正歯科おすすめ比較.com All rights reserved.</p>
+                <p class="copyright">&copy; 2025 おすすめ比較.com All rights reserved.</p>
             </div>
         </div>
     </footer>
+
+    <script>
+        // サイト共通テキストを読み込んで表示する
+        fetch('/common_data/data/site-common-texts.json')
+            .then(response => response.json())
+            .then(data => {
+                // サイト名を置き換え
+                const siteTitles = document.querySelectorAll('.site-title');
+                const copyrights = document.querySelectorAll('.copyright');
+
+                siteTitles.forEach(el => {
+                    if (el.textContent.includes('おすすめ比較.com')) {
+                        el.textContent = data.サイト名;
+                    }
+                });
+
+                copyrights.forEach(el => {
+                    if (el.textContent.includes('おすすめ比較.com')) {
+                        el.innerHTML = el.innerHTML.replace('おすすめ比較.com', data.サイト名);
+                    }
+                });
+            })
+            .catch(error => console.error('サイト共通テキストの読み込みに失敗しました:', error));
+    </script>
 </body>
 </html>

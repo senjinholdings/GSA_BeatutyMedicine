@@ -293,5 +293,29 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        // サイト共通テキストを読み込んで表示する
+        fetch('/common_data/data/site-common-texts.json')
+            .then(response => response.json())
+            .then(data => {
+                // サイト名を置き換え
+                const siteTitles = document.querySelectorAll('.site-title');
+                const copyrights = document.querySelectorAll('.copyright');
+
+                siteTitles.forEach(el => {
+                    if (el.textContent.includes('矯正歯科おすすめ比較.com')) {
+                        el.textContent = data.サイト名;
+                    }
+                });
+
+                copyrights.forEach(el => {
+                    if (el.textContent.includes('矯正歯科おすすめ比較.com')) {
+                        el.innerHTML = el.innerHTML.replace('矯正歯科おすすめ比較.com', data.サイト名);
+                    }
+                });
+            })
+            .catch(error => console.error('サイト共通テキストの読み込みに失敗しました:', error));
+    </script>
 </body>
 </html>
