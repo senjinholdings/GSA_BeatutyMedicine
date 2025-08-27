@@ -2865,13 +2865,13 @@ class RankingApp {
         const point3Desc = document.getElementById('point3-description');
         
         if (point1Title) point1Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1タイトル', '');
-        if (point1Desc) point1Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT1内容', '');
+        if (point1Desc) point1Desc.innerHTML = window.dataManager.getClinicText(clinicCode, 'POINT1内容', '');
 
         if (point2Title) point2Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2タイトル', '');
-        if (point2Desc) point2Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT2内容', '');
+        if (point2Desc) point2Desc.innerHTML = window.dataManager.getClinicText(clinicCode, 'POINT2内容', '');
 
         if (point3Title) point3Title.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3タイトル', '');
-        if (point3Desc) point3Desc.textContent = window.dataManager.getClinicText(clinicCode, 'POINT3内容', '');
+        if (point3Desc) point3Desc.innerHTML = window.dataManager.getClinicText(clinicCode, 'POINT3内容', '');
         
         // ロゴ画像を更新
         const infoLogo = document.getElementById('first-choice-info-logo');
