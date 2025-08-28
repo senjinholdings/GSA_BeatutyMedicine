@@ -846,7 +846,7 @@ text-align: center;
                     </select>
                 </div>
                 <div class="sidebar-search-button">
-                    <a href="search-results/" class="sidebar-search-link">詳細検索ページへ</a>
+                    <a href="./search-results.html" class="sidebar-search-link">詳細検索ページへ</a>
                 </div>
             </div>
         </div>
@@ -941,7 +941,7 @@ text-align: center;
                             console.log('Saved redirect params to localStorage:', params);
 
                             // redirect.htmlに移動
-                            window.location.href = link.href;
+                            window.open(link.href, '_blank', 'noopener');
                         } catch (error) {
                             console.error('Failed to save redirect params:', error);
                         }
@@ -966,7 +966,7 @@ text-align: center;
                             console.log('Saved fallback params to localStorage:', params);
 
                             // redirect.htmlに移動
-                            window.location.href = link.href;
+                            window.open(link.href, '_blank', 'noopener');
                         }
                     }
                 }

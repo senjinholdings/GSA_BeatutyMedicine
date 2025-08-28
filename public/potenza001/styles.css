@@ -6521,15 +6521,6 @@ section.clinic-rankings .ranking-header-banner {
     object-fit: contain;
 }
 
-/* 追加: シンプルスライダーのナビとドット調整 */
-.case-slider .case-nav {
-    appearance: none;
-    -webkit-appearance: none;
-}
-.case-dots .case-dot.active {
-    background: #2CC7C5 !important;
-}
-
 /* Slickのドット */
 .case-slider .slick-dots {
     position: relative;
