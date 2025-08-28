@@ -1859,41 +1859,48 @@ text-align: center;
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {})
-                    .catch(err => {});
+                const base = (window.SITE_CONFIG && window.SITE_CONFIG.basePath) ? window.SITE_CONFIG.basePath : '.';
+                const swUrl = `${base}/sw.js`;
+                navigator.serviceWorker.register(swUrl, { scope: base + '/' })
+                    .then(() => {})
+                    .catch(() => {});
             });
         }
     </script>
     
-    <!-- Load common site data -->
+    <!-- Load common site data from CSV via app.js (data/site-common-texts.csv) -->
     <script>
-        // Load common site data
-        fetch('../../../common_data/data/site-common-texts.json')
-            .then(response => response.json())
-            .then(data => {
-                // Update site logo
-                const siteLogo = document.getElementById('site-logo');
-                if (siteLogo && data.サイト名) {
-                    siteLogo.textContent = data.サイト名;
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 待機: app.js内でDataManager初期化→CSV読込完了を待つ
+            const waitFor = async (cond, tries = 100, interval = 100) => {
+                for (let i = 0; i < tries; i++) {
+                    if (cond()) return true;
+                    await new Promise(r => setTimeout(r, interval));
                 }
+                return false;
+            };
 
-                // Update favicon
-                const favicon = document.getElementById('header-logo-icon');
-                if (favicon && data.ファビコン画像パス) {
-                    favicon.src = data.ファビコン画像パス;
-                }
+            const ok = await waitFor(() => window.app && window.app.dataManager && window.app.dataManager.commonTexts && Object.keys(window.app.dataManager.commonTexts).length > 0);
+            const data = ok ? window.app.dataManager.commonTexts : {};
 
-                // Update footer site name (copyright text contains both site name and copyright)
-                const footerSiteName = document.querySelector('.copyright');
-                if (footerSiteName && data.サイト名) {
-                    footerSiteName.textContent = '© 2025 ' + data.サイト名;
-                }
-                
-            })
-            .catch(error => {
-                console.error('Error loading common site data:', error);
-            });
+            // サイト名
+            const siteLogo = document.getElementById('site-logo');
+            if (siteLogo && data['サイト名']) {
+                siteLogo.textContent = data['サイト名'];
+            }
+
+            // ヘッダーロゴ画像（既にapp.jsで設定済みだが冪等に反映）
+            const headerLogo = document.getElementById('header-logo-icon');
+            if (headerLogo && data['ファビコン画像パス']) {
+                headerLogo.src = data['ファビコン画像パス'];
+            }
+
+            // フッターのサイト名
+            const footerSiteName = document.querySelector('.copyright');
+            if (footerSiteName && data['サイト名']) {
+                footerSiteName.textContent = '© 2025 ' + data['サイト名'];
+            }
+        });
     </script>
     <script src="/tracking-params.js"></script>
 </body>
