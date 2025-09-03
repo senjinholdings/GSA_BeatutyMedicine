@@ -6391,10 +6391,26 @@ body.no-scroll { overflow: hidden; }
     gap: 20px;
 }
 
-.scroll-modal-text {
+.scroll-modal-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
+}
+
+.scroll-modal-logo {
+    height: 50px;
+    width: auto;
+    max-width: 120px;
+    object-fit: contain;
+    background: white;
+    padding: 5px;
+    border-radius: 8px;
+}
+
+.scroll-modal-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     color: white;
 }
 
@@ -6451,15 +6467,22 @@ body.no-scroll { overflow: hidden; }
     }
     
     .scroll-modal-content {
-        flex-direction: column;
         gap: 10px;
         padding: 10px 0;
     }
     
+    .scroll-modal-left {
+        flex: 1;
+        gap: 10px;
+    }
+    
+    .scroll-modal-logo {
+        height: 40px;
+        max-width: 80px;
+    }
+    
     .scroll-modal-text {
-        flex-direction: column;
-        text-align: center;
-        gap: 8px;
+        gap: 5px;
     }
     
     .scroll-modal-text p {
