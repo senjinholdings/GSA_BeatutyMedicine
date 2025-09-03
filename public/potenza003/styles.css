@@ -2060,6 +2060,7 @@ section.clinic-rankings .ranking-header-banner {
     justify-content: center;
     gap: 0px;
     background: linear-gradient(135deg, #ff95ad 0%, #ff95ad 100%);
+    border-bottom:solid 5px #cf657d;
     color: white;
     padding: 15px 25px;
     border-radius: 4px;
@@ -2411,6 +2412,7 @@ section.clinic-rankings .ranking-header-banner {
 .comparison-table .link_btn {
     display: inline-block;
     background: #ff95ae;
+    border-bottom:solid 2px #cf657d;
     color: white;
     text-decoration: none;
     padding: 8px 15px;
@@ -5827,6 +5829,7 @@ section.clinic-rankings .ranking-header-banner {
     border-radius: 4px;
     font-size: 13px;
     background-color: #f39ea7;
+    border-bottom:solid 2px #cf657d;
     color: #fff;
     font-weight: 600;
     white-space: nowrap;

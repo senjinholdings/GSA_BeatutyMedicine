@@ -3654,14 +3654,10 @@ class RankingApp {
                     const buildRow = (label, val) => `<tr><td style=\"padding: 0 8px !important; background-color: #f8f8f8 !important; font-weight: bold !important; width: 30% !important;\">${label}</td><td style=\"padding: 0 8px !important;\">${val}</td></tr>`;
                     const slidesHtml = imagesForClinic.map((img, idx) => {
                         const keyBase = `case${idx + 1}`;
-                        // まずcaseNを参照し、無ければcase1をフォールバックとして使用
-                        const fallbackName = dm.getClinicText(clinicCode, `case1コース名`, '');
-                        const fallbackDesc = dm.getClinicText(clinicCode, `case1施術の説明`, '');
-                        const fallbackRisk = dm.getClinicText(clinicCode, `case1副作用（リスク）`, '');
-
-                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || fallbackName || '—';
-                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || fallbackDesc || '—';
-                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || fallbackRisk || '—';
+                        // 各スライドは対応するcaseNを参照（case1へのフォールバックは行わない）
+                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || '—';
+                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || '—';
+                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || '—';
                         return `
                             <div class=\"case-slide\" style=\"min-width:100%;box-sizing:border-box;\">
                                 <img src=\"${img.fallbacks[0]}\" alt=\"${img.alt}\" loading=\"lazy\" style=\"width:100%;height:auto;object-fit:contain;\">
@@ -3882,56 +3878,74 @@ class RankingApp {
                 try {
                     const root = detailItem;
                     const track = root.querySelector('.case-track');
-                    const slides = root.querySelectorAll('.case-slide');
-                    const dots = root.querySelectorAll('.case-dot');
+                    let slides = Array.from(root.querySelectorAll('.case-slide'));
+                    const dotsWrap = root.querySelector('.case-dots');
+                    let dots = Array.from(root.querySelectorAll('.case-dot'));
                     const prevBtn = root.querySelector('.case-nav-prev');
                     const nextBtn = root.querySelector('.case-nav-next');
                     const caseSection = root.querySelector('.case-slider')?.closest('.clinic-points-section');
-                    const imgs = root.querySelectorAll('.case-slider img');
+                    const imgs = Array.from(root.querySelectorAll('.case-slider img'));
 
                     // 画像が1枚も無い、もしくは全て読み込み失敗の場合はセクション非表示
                     if (!imgs || imgs.length === 0) {
                         if (caseSection) caseSection.style.display = 'none';
                         return;
                     }
-                    let loaded = 0;
-                    let errors = 0;
-                    const total = imgs.length;
-                    const maybeHide = () => {
-                        if (errors >= total && caseSection) {
-                            caseSection.style.display = 'none';
-                        }
+                    let current = 0;
+                    const reindex = () => {
+                        slides = Array.from(root.querySelectorAll('.case-slide'));
+                        dots = Array.from(root.querySelectorAll('.case-dot'));
+                        dots.forEach((d, i) => d.setAttribute('data-index', String(i)));
                     };
-                    imgs.forEach(img => {
-                        // 既に読み込み済みか判定
-                        if (img.complete && img.naturalWidth > 0) {
-                            loaded++;
-                        }
-                        img.addEventListener('load', () => { loaded++; });
-                        img.addEventListener('error', () => { errors++; maybeHide(); });
+                    const updateNavVisibility = () => {
+                        const show = slides.length > 1;
+                        if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+                        if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+                        if (dotsWrap) dotsWrap.style.display = show ? 'block' : 'none';
+                    };
+                    const show = (i) => {
+                        if (!slides.length || !track) return;
+                        if (i < 0) i = slides.length - 1;
+                        if (i >= slides.length) i = 0;
+                        current = i;
+                        track.style.display = 'flex';
+                        track.style.transform = `translateX(-${current * 100}%)`;
+                        track.style.transition = 'transform .3s ease';
+                        slides.forEach(s => { s.style.minWidth = '100%'; s.style.boxSizing = 'border-box'; });
+                        dots.forEach((d, idx) => {
+                            d.classList.toggle('active', idx === current);
+                            d.style.background = (idx === current ? '#2CC7C5' : '#ccc');
+                        });
+                    };
+
+                    // 画像エラー時に該当スライドとドットを削除
+                    imgs.forEach((img) => {
+                        img.addEventListener('error', () => {
+                            const slide = img.closest('.case-slide');
+                            if (!slide) return;
+                            const idx = slides.indexOf(slide);
+                            if (idx >= 0) {
+                                // 対応するドットも削除
+                                const dot = dots[idx];
+                                if (dot && dot.parentNode) dot.parentNode.removeChild(dot);
+                                if (slide && slide.parentNode) slide.parentNode.removeChild(slide);
+                                reindex();
+                                if (slides.length === 0) {
+                                    if (caseSection) caseSection.style.display = 'none';
+                                    return;
+                                }
+                                if (current >= slides.length) current = slides.length - 1;
+                                updateNavVisibility();
+                                show(current);
+                            }
+                        }, { once: true });
                     });
-                    // タイムアウトでもう一度判定（キャッシュやイベント取りこぼし対策）
-                    setTimeout(() => {
-                        if (loaded === 0) {
-                            errors = total;
-                            maybeHide();
-                        }
-                    }, 1200);
+
                     if (track && slides.length) {
-                        let current = 0;
-                        function show(i){
-                            if (i<0) i = slides.length-1;
-                            if (i>=slides.length) i = 0;
-                            current = i;
-                            track.style.display = 'flex';
-                            track.style.transform = `translateX(-${current*100}%)`;
-                            track.style.transition = 'transform .3s ease';
-                            slides.forEach(s=>{ s.style.minWidth='100%'; s.style.boxSizing='border-box'; });
-                            dots.forEach((d,idx)=>{ d.classList.toggle('active', idx===current); d.style.background = idx===current ? '#2CC7C5' : '#ccc'; });
-                        }
-                        prevBtn && prevBtn.addEventListener('click', ()=>show(current-1));
-                        nextBtn && nextBtn.addEventListener('click', ()=>show(current+1));
-                        dots.forEach((d,idx)=> d.addEventListener('click', ()=>show(idx)));
+                        prevBtn && prevBtn.addEventListener('click', () => show(current - 1));
+                        nextBtn && nextBtn.addEventListener('click', () => show(current + 1));
+                        dots.forEach((d, idx) => d.addEventListener('click', () => show(idx)));
+                        updateNavVisibility();
                         show(0);
                     }
                 } catch(e) {}
