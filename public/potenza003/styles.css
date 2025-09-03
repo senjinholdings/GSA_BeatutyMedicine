@@ -22,7 +22,7 @@ body {
 }
 
 /* メインコンテナ - PC表示でも最大768pxに制限 */
-body > *:not(.sidebar-menu):not(.sidebar-overlay):not(.map-modal):not(.disclaimer-modal):not(.banner-modal) {
+body > *:not(.sidebar-menu):not(.sidebar-overlay):not(.map-modal):not(.disclaimer-modal):not(.banner-modal):not(.scroll-bottom-modal) {
     width: 100%;
     max-width: 768px;
     margin: 0 auto;
@@ -299,8 +299,8 @@ select {
     left: 0;
     width: 100vw;   /* ビューポート全体 */
     height: 100vh;  /* ビューポート全体 */
-    max-width: none; /* グローバル幅制限の影響を無効化 */
-    margin: 0;       /* 中央寄せの影響を無効化 */
+    max-width: none; /* 中央寄せレイアウトの影響を受けない */
+    margin: 0;
     background: rgba(0, 0, 0, 0.5);
     display: none;
     z-index: 999;
@@ -2850,16 +2850,10 @@ section.clinic-rankings .ranking-header-banner {
 
 /* ===== バナー拡大モーダル ===== */
 .banner-modal {
-    display: none;
-    position: fixed;
+    display: none; position: fixed; z-index: 10000;
     z-index: 12000;
-    left: 0;
-    top: 0;
-    width: 100vw;   /* 画面幅いっぱい */
-    height: 100vh;  /* 画面高さいっぱい */
-    max-width: none; /* グローバルのmax-width制約を無効化 */
-    margin: 0;       /* 自動マージンの影響を無効化 */
-    background-color: rgba(0,0,0,0.9);
+    left: 0; top: 0; width: 100%; height: 100%;
+    overflow: auto; background-color: rgba(0,0,0,0.9);
 }
 .banner-modal.active { display: flex; justify-content: center; align-items: center; }
 .banner-modal-content { position: relative; max-width: 90%; max-height: 90%; }
@@ -6269,7 +6263,7 @@ body.no-scroll { overflow: hidden; }
     }
     
     .tips-container .tab {
-        padding: 10px 3px !important;
+        padding: 10px 8px !important;
         font-size: 12px !important;
     }
     
@@ -6334,213 +6328,6 @@ body.no-scroll { overflow: hidden; }
 
 .info-icon:hover {
     background-color: #999;
-}
-
-/* スクロール追従モーダル */
-.scroll-bottom-modal {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 10vh; /* ビューポートの10% */
-    min-height: 80px;
-    max-height: 120px;
-    background: white;
-    box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    border-top: 1px solid #eee;
-    overflow: visible;
-}
-
-.scroll-bottom-modal.show {
-    transform: translateY(0);
-}
-
-/* 吹き出しバブル */
-.scroll-modal-bubble {
-    position: absolute;
-    top: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #2CC7C5;
-    color: white;
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-    white-space: nowrap;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.scroll-bottom-modal.show .scroll-modal-bubble {
-    opacity: 1;
-}
-
-.scroll-modal-bubble::before {
-    content: '✓';
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.scroll-modal-bubble::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #2CC7C5;
-}
-
-
-.scroll-modal-close {
-    position: absolute;
-    top: -17px;
-    right: 9px;
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: #666;
-    font-size: 24px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-    z-index: 1;
-}
-
-.scroll-modal-close:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.scroll-modal-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: 20px;
-}
-
-.scroll-modal-left {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.scroll-modal-logo {
-    height: 50px;
-    width: auto;
-    max-width: 120px;
-    object-fit: contain;
-}
-
-
-.scroll-modal-btn {
-    display: flex;
-    align-items: center;
-    background: #ff95ad;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 14px;
-    transition: all 0.3s;
-    box-shadow: 0 3px 10px rgba(255, 149, 173, 0.3);
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    overflow: hidden;
-    height: 50px;
-}
-
-.scroll-modal-btn-free {
-    background: #ff6b8a;
-    padding: 0 15px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.scroll-modal-btn-text {
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    line-height: 1.2;
-    height: 100%;
-}
-
-.scroll-modal-btn-text span {
-    display: block;
-    font-size: 13px;
-}
-
-.scroll-modal-btn:hover {
-    background: #ff7a96;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 149, 173, 0.4);
-}
-
-/* モバイル対応 */
-@media (max-width: 768px) {
-    .scroll-bottom-modal {
-        padding: 0 15px;
-    }
-    
-    .scroll-modal-content {
-        gap: 10px;
-        padding: 10px 0;
-    }
-    
-    .scroll-modal-left {
-        flex: 1;
-        gap: 10px;
-    }
-    
-    .scroll-modal-logo {
-        height: 40px;
-        max-width: 80px;
-    }
-    
-    .scroll-modal-bubble {
-        font-size: 12px;
-        padding: 6px 15px;
-        top: -30px;
-    }
-    
-    .scroll-modal-bubble::after {
-        border-left-width: 8px;
-        border-right-width: 8px;
-        border-top-width: 8px;
-        bottom: -7px;
-    }
-    
-    .scroll-modal-btn {
-        padding: 8px 20px;
-        font-size: 13px;
-    }
 }
 
 /* 詳細情報モーダル */
@@ -8052,7 +7839,7 @@ body .case-slider .slick-slide img {
     }
     
     /* body直下の要素から特定の要素を除外 */
-    body > *:not(.sidebar-menu):not(.sidebar-overlay):not(.map-modal):not(.disclaimer-modal):not(.banner-modal) {
+    body > *:not(.sidebar-menu):not(.sidebar-overlay):not(.map-modal):not(.disclaimer-modal) {
         width: 100% !important;
         max-width: 768px !important;
         margin: 0 auto !important;
@@ -8308,4 +8095,251 @@ body .case-slider .slick-slide img {
         min-width: 190px !important;
     }
     
+}
+/* スクロール追従モーダル（下から10%高） */
+.scroll-bottom-modal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 10vh; /* ビューポートの10% */
+    min-height: 80px;
+    max-height: 120px;
+    background: #fff; /* 背景は白 */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    max-width: none; /* グローバル幅制限の影響を受けない */
+    margin: 0;
+}
+
+.scroll-bottom-modal.show {
+    transform: translateY(0);
+}
+
+.scroll-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.scroll-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.scroll-modal-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+}
+
+.scroll-modal-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.scroll-modal-logo {
+    /* 画像サイズをモーダル内に確実に収める（他の img ルールより優先させる） */
+    height: clamp(32px, 8vh, 48px) !important;
+    max-width: min(40vw, 120px) !important;
+    width: auto !important;
+    object-fit: contain;
+    background: white;
+    padding: 5px;
+    border-radius: 8px;
+    display: block;
+    flex: 0 0 auto;
+}
+
+.scroll-modal-text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: white;
+}
+
+/* 吹き出し（CHECK）をモーダルの上に表示 */
+.scroll-modal-bubble {
+    position: absolute;
+    bottom: 100%;
+    left: 20px;
+    transform: translateY(-8px);
+    background: #ff6b6b;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.scroll-modal-bubble::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: #ff6b6b transparent transparent transparent;
+}
+
+.scroll-modal-text p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.scroll-modal-btn {
+    display: flex;
+    align-items: center;
+    background: #ff95ad;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s;
+    box-shadow: 0 3px 10px rgba(255, 149, 173, 0.3);
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 50px;
+}
+
+.scroll-modal-btn-free {
+    background: #ff4d6d;
+    padding: 0 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.scroll-modal-btn-text {
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    line-height: 1.2;
+    height: 100%;
+}
+
+.scroll-modal-btn-text span {
+    display: block;
+    font-size: 13px;
+}
+
+.scroll-modal-btn:hover {
+    background: #ff7a96;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 149, 173, 0.4);
+}
+
+.scroll-modal-btn:hover .scroll-modal-btn-free {
+    background: #ff3057;
+}
+
+@media (max-width: 768px) {
+    .scroll-bottom-modal { padding: 0 15px; }
+    .scroll-modal-bubble { left: 12px; }
+    .scroll-modal-content { gap: 10px; padding: 10px 0; }
+    .scroll-modal-left { flex: 1; gap: 10px; }
+    .scroll-modal-logo {
+        height: clamp(32px, 8vh, 48px) !important;
+        max-width: min(40vw, 120px) !important;
+        width: auto !important;
+    }
+    .scroll-modal-text { gap: 5px; }
+    .scroll-modal-text p { font-size: 14px; }
+    .scroll-modal-btn { padding: 8px 20px; font-size: 13px; }
+}
+
+/* =============================
+   追従モーダルCTA（無料タグ付き）
+   ============================= */
+.fixed-mail-hankyo-button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 46px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #ff95ad 0%, #ff95ad 100%);
+    box-shadow: inset 0 -5px 0 #cf657d; /* 既存ボタンの濃いピンクで陰影 */
+    overflow: hidden; /* 左タグの角丸を活かす */
+}
+
+.fixed-mail-hankyo-button__tag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 46px; /* タグ幅やや広め */
+    background: #fff;
+    color: #cf657d; /* 既存の濃いピンク */
+    border-right: 2px solid #cf657d; /* 濃いピンクの仕切り */
+    border-radius: 4px 0 0 4px;
+    box-sizing: border-box;
+    font-size: 12px;
+}
+
+.fixed-mail-hankyo-button__inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+}
+
+.fixed-mail-hankyo-button__inner__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.fixed-mail-hankyo-button__inner__text__sub {
+    font-size: 11px;
+    opacity: 0.95;
+}
+
+.fixed-mail-hankyo-button__inner__text__main {
+    font-size: 15px;
+}
+
+@media (max-width: 768px) {
+    .fixed-mail-hankyo-button { height: 44px; }
+    .fixed-mail-hankyo-button__tag { width: 44px; font-size: 11px; }
+    .fixed-mail-hankyo-button__inner__text__main { font-size: 14px; }
 }
