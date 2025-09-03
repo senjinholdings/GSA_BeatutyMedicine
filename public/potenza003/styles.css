@@ -5539,7 +5539,7 @@ body.no-scroll { overflow: hidden; }
     
     /* 375px専用: 詳細セクション */
     .clinic-details-section {
-        padding: 20px 10px;
+        padding: 20px 0px;
         width: 100%;
         /* max-width: 480px; */
         margin: 0 auto;

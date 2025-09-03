@@ -859,6 +859,80 @@ class DataManager {
         }
     }
 
+    // 口コミタブのラベルをCSV（項目名）から抽出（クリニック別に順序付きで取得）
+    // 返却: ラベル配列（例: ['特典','スタッフ','サービス']）。n=1→3の順。重複は最初のみ。
+    // 括弧は全角/半角の両方に対応。
+    getReviewTabLabels(clinicCode) {
+        try {
+            // 指定クリニックのデータを取得
+            const codeToNameMap = {
+                'tcb': 'TCB',
+                'TCB': 'TCB',
+                'luna': 'LUNAビューティークリニック',
+                'LUNAビューティークリニック': 'LUNAビューティークリニック',
+                'rize': 'リゼクリニック',
+                'リゼクリニック': 'リゼクリニック',
+                'shinagawa': '品川美容外科',
+                '品川美容外科': '品川美容外科',
+                'seishin': '聖心美容クリニック',
+                '聖心美容クリニック': '聖心美容クリニック'
+            };
+            let clinicName = codeToNameMap[clinicCode];
+            if (!clinicName) {
+                const clinic = this.clinics.find(c => c.code === clinicCode);
+                clinicName = clinic ? clinic.name : null;
+            }
+            // fallback: 先頭のクリニック
+            const specialKeys = new Set(['比較表ヘッダー設定', '詳細フィールドマッピング']);
+            if (!clinicName) {
+                const clinicKeys = Object.keys(this.clinicTexts || {}).filter(k => !specialKeys.has(k));
+                clinicName = clinicKeys[0];
+            }
+            const clinicData = (this.clinicTexts && clinicName) ? (this.clinicTexts[clinicName] || {}) : {};
+
+            // 全キーを上から走査し、カテゴリ（括弧内）を初出順に収集
+            // かつ、各カテゴリの最小n（口コミnタイトル）を保持し、n昇順→初出順でソート
+            const keys = Object.keys(clinicData);
+            const meta = new Map(); // label -> { firstIndex, minN }
+            for (let idx = 0; idx < keys.length; idx++) {
+                const k = keys[idx];
+                let m = k.match(/^口コミ([1-3])タイトル（(.+?)）$/);
+                if (!m) m = k.match(/^口コミ([1-3])タイトル\((.+?)\)$/);
+                if (!m) continue;
+                const n = parseInt(m[1], 10);
+                const label = m[2];
+                if (!meta.has(label)) {
+                    meta.set(label, { firstIndex: idx, minN: n });
+                } else {
+                    const obj = meta.get(label);
+                    if (n < obj.minN) obj.minN = n;
+                }
+            }
+            let labels = Array.from(meta.entries())
+                .sort((a, b) => (a[1].minN - b[1].minN) || (a[1].firstIndex - b[1].firstIndex))
+                .map(([label]) => label);
+            if (labels.length === 0) labels = ['コスパ', 'スタッフ', 'サービス'];
+            // 最大3つまでに制限（UI都合）
+            return labels.slice(0, 3);
+        } catch (_) {
+            return ['コスパ', 'スタッフ', 'サービス'];
+        }
+    }
+
+    // 指定ラベル（括弧内）に対応する口コミ配列を取得（タイトル/内容×1..3）
+    getClinicReviewsByLabel(clinicCode, label) {
+        const reviews = [];
+        for (let i = 1; i <= 3; i++) {
+            // 全角/半角括弧の両方を試す
+            let title = this.getClinicText(clinicCode, `口コミ${i}タイトル（${label}）`, '');
+            if (!title) title = this.getClinicText(clinicCode, `口コミ${i}タイトル(${label})`, '');
+            let content = this.getClinicText(clinicCode, `口コミ${i}内容（${label}）`, '');
+            if (!content) content = this.getClinicText(clinicCode, `口コミ${i}内容(${label})`, '');
+            if (title || content) reviews.push({ title, content });
+        }
+        return reviews;
+    }
+
     // ダブルクオートを考慮したCSVパーサ
     parseCsvWithQuotes(csvText) {
         const lines = csvText.split(/\r?\n/);
@@ -2228,9 +2302,10 @@ class RankingApp {
             this.displayManager.updateFooterClinics(allClinics, ranking);
 
             // 店舗リストの取得と表示（クリニックごとにグループ化）
-            const stores = this.dataManager.getStoresByRegionId(normalizedRegionId);
-            const clinicsWithStores = this.groupStoresByClinics(stores, ranking, allClinics);
-            this.displayManager.updateStoresDisplay(stores, clinicsWithStores);
+            // 店舗一覧表示は無効化（不要なUIのため）
+            // const stores = this.dataManager.getStoresByRegionId(normalizedRegionId);
+            // const clinicsWithStores = this.groupStoresByClinics(stores, ranking, allClinics);
+            // this.displayManager.updateStoresDisplay(stores, clinicsWithStores);
 
             // 比較表ヘッダーの更新
             this.updateComparisonHeaders();
@@ -2718,7 +2793,7 @@ class RankingApp {
                     
                     td.className = 'ranking-table_td1';
                     td.innerHTML = `
-                        <img src="${logoPath}" alt="${clinic.name}" width="80">
+                        <img src="${logoPath}" alt="${clinic.name}" width="80" data-rank="${rankNum}" class="comparison-logo">
                         <a href="#" ${clinicNameOnclick} class="clinic-link" style="cursor: pointer;">${clinic.name}</a>
                     `;
                 } else if (fieldName === 'comparison1') {
@@ -3321,10 +3396,34 @@ class RankingApp {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const rank = parseInt(link.getAttribute('data-rank'));
-                        this.scrollToClinicDetail(rank);
+                        let rank = parseInt(link.getAttribute('data-rank'));
+                        if (!rank || Number.isNaN(rank)) {
+                            const href = link.getAttribute('href') || '';
+                            const m = href.match(/#clinic(\d+)/);
+                            if (m) rank = parseInt(m[1], 10);
+                        }
+                        if (rank && !Number.isNaN(rank)) {
+                            openClinicDetailModal(rank);
+                        }
                     });
-                } else {
+                }
+            });
+
+            // 比較表のロゴ画像クリックでもモーダルを開く
+            const logoImgs = document.querySelectorAll('#comparison-table td.ranking-table_td1 img.comparison-logo');
+            logoImgs.forEach(img => {
+                if (!img.hasAttribute('data-listener-attached')) {
+                    img.setAttribute('data-listener-attached', 'true');
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const rankAttr = img.getAttribute('data-rank');
+                        const rank = parseInt(rankAttr, 10);
+                        if (rank && !Number.isNaN(rank)) {
+                            openClinicDetailModal(rank);
+                        }
+                    });
                 }
             });
             
@@ -3332,11 +3431,17 @@ class RankingApp {
             const staticLinks = document.querySelectorAll('.detail-static-link');
             
             staticLinks.forEach((link, index) => {
-                
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const rank = parseInt(link.getAttribute('data-rank'));
-                    this.scrollToClinicDetail(rank);
+                    let rank = parseInt(link.getAttribute('data-rank'));
+                    if (!rank || Number.isNaN(rank)) {
+                        const href = link.getAttribute('href') || '';
+                        const m = href.match(/#clinic(\d+)/);
+                        if (m) rank = parseInt(m[1], 10);
+                    }
+                    if (rank && !Number.isNaN(rank)) {
+                        openClinicDetailModal(rank);
+                    }
                 });
             });
             
@@ -3353,55 +3458,10 @@ class RankingApp {
         }, 500); // setTimeoutの閉じ括弧を追加
     }
     
-    // クリニック詳細へスクロール
+    // クリニック詳細へ（互換）
     scrollToClinicDetail(rank) {
-        
-        // 直接IDで要素を取得（静的比較表と同じ形式）
-        const targetId = `clinic${rank}`;
-        
-        const targetElement = document.getElementById(targetId);
-        
-        // すべての詳細要素を確認
-        const allDetailElements = document.querySelectorAll('[id^="clinic"]');
-        allDetailElements.forEach(el => {
-            if (el.id.match(/^clinic\d+$/)) {
-                // Check element visibility
-            }
-        });
-        
-        // clinic-details-listセクションの存在確認
-        const detailsList = document.getElementById('clinic-details-list');
-        if (detailsList) {
-        }
-        
-        if (targetElement) {
-            // 要素の位置を取得してスクロール
-            const rect = targetElement.getBoundingClientRect();
-            
-            const elementTop = rect.top + window.pageYOffset;
-            const offset = 100; // ヘッダーの高さ分のオフセット
-            const scrollTo = elementTop - offset;
-            
-            window.scrollTo({
-                top: scrollTo,
-                behavior: 'smooth'
-            });
-            
-            // スクロール後の確認
-            setTimeout(() => {
-            }, 1000);
-        } else {
-            // 詳細要素が見つからない場合は、セクション全体にスクロール
-            const detailSection = document.getElementById('clinic-details-list');
-            if (detailSection) {
-                const sectionTop = detailSection.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({
-                    top: sectionTop - 100,
-                    behavior: 'smooth'
-                });
-            } else {
-            }
-        }
+        // 既存呼び出しの互換用: モーダル表示に置き換え
+        if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
     }
     
     // レビュータブ切り替え機能の設定
@@ -3533,27 +3593,20 @@ class RankingApp {
                         </div>
                     </div>
                 ${(() => {
-                    // DataManagerからバナーパスを動的に取得
+                    // DataManagerからバナー画像パス候補を生成（CSV指定 + bnr2以降）
                     const clinicCode = this.dataManager.getClinicCodeById(clinicId);
                     const bannerFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
-                    
-                    // 汎用: 複数バナー候補を命名規則から生成（存在しない画像は初期化時に除外）
-                    const base = `../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr.webp`;
-                    // ベース（*_detail_bnr.webp）は全クリニックで表示しない
+                    // ベース（*_detail_bnr.webp）は使用しない。CSV指定と *_detail_bnr2.webp 以降を使用
                     const candidates = [];
-                    // CSVで指定があれば最優先で追加（ベース指定も許可）
                     const csvBannerRaw = this.dataManager.getClinicText(clinicCode, '詳細バナー画像パス', '');
                     if (csvBannerRaw) {
                         candidates.push(csvBannerRaw);
-                    }
-                    // TCBのポテンツァ専用バナーも候補に追加（CSVよりは後ろ）
-                    if (clinicCode === 'tcb') {
-                        candidates.push(`../common_data/images/clinics/tcb/tcb_detail_bnr_potenza.webp`);
                     }
                     for (let i = 2; i <= 10; i++) {
                         candidates.push(`../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr${i}.webp`);
                     }
                     const bannerImages = Array.from(new Set(candidates));
+                    if (!bannerImages.length) return '';
 
                     return `
                     <div class="detail-banner banner-slider" data-clinic-id="${clinicId}">
@@ -3660,14 +3713,10 @@ class RankingApp {
                     const buildRow = (label, val) => `<tr><td style=\"padding: 0 8px !important; background-color: #f8f8f8 !important; font-weight: bold !important; width: 30% !important;\">${label}</td><td style=\"padding: 0 8px !important;\">${val}</td></tr>`;
                     const slidesHtml = imagesForClinic.map((img, idx) => {
                         const keyBase = `case${idx + 1}`;
-                        // まずcaseNを参照し、無ければcase1をフォールバックとして使用
-                        const fallbackName = dm.getClinicText(clinicCode, `case1コース名`, '');
-                        const fallbackDesc = dm.getClinicText(clinicCode, `case1施術の説明`, '');
-                        const fallbackRisk = dm.getClinicText(clinicCode, `case1副作用（リスク）`, '');
-
-                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || fallbackName || '—';
-                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || fallbackDesc || '—';
-                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || fallbackRisk || '—';
+                        // 各スライドは対応するcaseNを参照（case1へのフォールバックは行わない）
+                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || '—';
+                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || '—';
+                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || '—';
                         return `
                             <div class=\"case-slide\" style=\"min-width:100%;box-sizing:border-box;\">
                                 <img src=\"${img.fallbacks[0]}\" alt=\"${img.alt}\" loading=\"lazy\" style=\"width:100%;height:auto;object-fit:contain;\">
@@ -3684,7 +3733,7 @@ class RankingApp {
                         `;
                     }).join('');
 
-                    const dotsHtml = imagesForClinic.map((_, i) => `<button class=\"case-dot ${i===0?'active':''}\" data-index=\"${i}\" style=\"width:8px;height:8px;border-radius:50%;border:none;background:${i===0?'#2CC7C5':'#ccc'};margin:0 4px;cursor:pointer;\"></button>`).join('');
+                    const dotsHtml = imagesForClinic.map((_, i) => `<button type=\"button\" class=\"case-dot ${i===0?'active':''}\" data-index=\"${i}\" style=\"width:8px;height:8px;border-radius:50%;border:none;background:${i===0?'#2CC7C5':'#ccc'};margin:0 4px;cursor:pointer;\"></button>`).join('');
                     
                     return `
                     <div class=\"clinic-points-section\">
@@ -3711,15 +3760,23 @@ class RankingApp {
                     <section id="review_tab_box">
                         <nav role="navigation" class="review_tab2">
                             <ul>
-                                <li class="select2" data-tab="cost"><i class="fas fa-yen-sign"></i> コスパ</li>
-                                <li data-tab="access"><i class="fas fa-user-md"></i> スタッフ</li>
-                                <li data-tab="staff"><i class="fas fa-heart"></i> サービス</li>
+                                ${(() => {
+                                    const clinicCodeForLabels = this.dataManager.getClinicCodeById(clinicId);
+                                    const labels = this.dataManager.getReviewTabLabels(clinicCodeForLabels) || [];
+                                    const icons = ['fa-yen-sign', 'fa-user-md', 'fa-heart'];
+                                    if (labels.length === 0) return '';
+                                    return labels.map((label, idx) => {
+                                        const icon = icons[idx] || 'fa-comment-dots';
+                                        const active = idx === 0 ? 'select2' : '';
+                                        return `<li class="${active}" data-tab="tab-${idx}"><i class="fas ${icon}"></i> ${label}</li>`;
+                                    }).join('');
+                                })()}
                             </ul>
                         </nav>
                         ${(() => {
-                            // 口コミデータを動的に取得
+                            // 口コミデータを動的に取得（タブラベルと中身をCSVの括弧内で対応させる）
                             const clinicCode = this.dataManager.getClinicCodeById(clinicId);
-                            const reviews = this.dataManager.getClinicReviews(clinicCode);
+                            const labelList = this.dataManager.getReviewTabLabels(clinicCode) || [];
                             const reviewIcons = [
                                 '../common_data/images/review_icon/review_icon1.webp',
                                 '../common_data/images/review_icon/review_icon2.webp',
@@ -3733,72 +3790,36 @@ class RankingApp {
                             ];
                             
                             let html = '';
+                            const dm = this.dataManager;
                             
-                            // コスパタブの口コミ
-                            html += '<div class="wrap_long2 active">';
-                            reviews.cost.forEach((review, index) => {
-                                const iconIndex = (rank + index) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
+                            // 3カテゴリを順番に描画（カテゴリと中身を対応）
+                            labelList.forEach((label, catIdx) => {
+                                const activeClass = catIdx === 0 ? 'active' : 'disnon2';
+                                html += `<div class="wrap_long2 ${activeClass}">`;
+                                const reviews = dm.getClinicReviewsByLabel(clinicCode, label);
+                                reviews.forEach((review, index) => {
+                                    const iconIndex = (rank + index + (catIdx*3)) % reviewIcons.length;
+                                    html += `
+                                        <div class="review_tab_box_in">
+                                            <div class="review_tab_box_img">
+                                                <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
+                                                <span>★★★★★</span>
+                                            </div>
+                                            <div class="review_tab_box_r">
+                                                <div class="review_tab_box_title"><strong>${review.title}</strong></div>
+                                                <div class="review_tab_box_txt">
+                                                    ${review.content}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                `;
+                                    `;
+                                });
+                                if (reviews.length === 0) {
+                                    html += '<div class="review_tab_box_in"><div class="review_tab_box_r"><div class="review_tab_box_txt">準備中</div></div></div>';
+                                }
+                                html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
+                                html += '</div>';
                             });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
-                            
-                            // 通いやすさタブの口コミ
-                            html += '<div class="wrap_long2 disnon2">';
-                            reviews.access.forEach((review, index) => {
-                                const iconIndex = (rank + index + 3) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
-                            
-                            // スタッフタブの口コミ
-                            html += '<div class="wrap_long2 disnon2">';
-                            reviews.staff.forEach((review, index) => {
-                                const iconIndex = (rank + index + 6) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
                             
                             return html;
                         })()}
@@ -3888,56 +3909,87 @@ class RankingApp {
                 try {
                     const root = detailItem;
                     const track = root.querySelector('.case-track');
-                    const slides = root.querySelectorAll('.case-slide');
-                    const dots = root.querySelectorAll('.case-dot');
+                    let slides = Array.from(root.querySelectorAll('.case-slide'));
+                    const dotsWrap = root.querySelector('.case-dots');
+                    let dots = Array.from(root.querySelectorAll('.case-dot'));
                     const prevBtn = root.querySelector('.case-nav-prev');
                     const nextBtn = root.querySelector('.case-nav-next');
                     const caseSection = root.querySelector('.case-slider')?.closest('.clinic-points-section');
-                    const imgs = root.querySelectorAll('.case-slider img');
+                    const imgs = Array.from(root.querySelectorAll('.case-slider img'));
 
                     // 画像が1枚も無い、もしくは全て読み込み失敗の場合はセクション非表示
                     if (!imgs || imgs.length === 0) {
                         if (caseSection) caseSection.style.display = 'none';
                         return;
                     }
-                    let loaded = 0;
-                    let errors = 0;
-                    const total = imgs.length;
-                    const maybeHide = () => {
-                        if (errors >= total && caseSection) {
-                            caseSection.style.display = 'none';
-                        }
+                    let current = 0;
+                    const reindex = () => {
+                        slides = Array.from(root.querySelectorAll('.case-slide'));
+                        dots = Array.from(root.querySelectorAll('.case-dot'));
+                        dots.forEach((d, i) => d.setAttribute('data-index', String(i)));
                     };
-                    imgs.forEach(img => {
-                        // 既に読み込み済みか判定
-                        if (img.complete && img.naturalWidth > 0) {
-                            loaded++;
-                        }
-                        img.addEventListener('load', () => { loaded++; });
-                        img.addEventListener('error', () => { errors++; maybeHide(); });
+                    const updateNavVisibility = () => {
+                        const show = slides.length > 1;
+                        if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+                        if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+                        if (dotsWrap) dotsWrap.style.display = show ? 'block' : 'none';
+                    };
+                    const show = (i) => {
+                        if (!slides.length || !track) return;
+                        if (i < 0) i = slides.length - 1;
+                        if (i >= slides.length) i = 0;
+                        current = i;
+                        track.style.display = 'flex';
+                        track.style.transform = `translateX(-${current * 100}%)`;
+                        track.style.transition = 'transform .3s ease';
+                        slides.forEach(s => { s.style.minWidth = '100%'; s.style.boxSizing = 'border-box'; });
+                        dots.forEach((d, idx) => {
+                            d.classList.toggle('active', idx === current);
+                            d.style.background = (idx === current ? '#2CC7C5' : '#ccc');
+                        });
+                    };
+
+                    // 画像エラー時に該当スライドとドットを削除
+                    imgs.forEach((img) => {
+                        img.addEventListener('error', () => {
+                            const slide = img.closest('.case-slide');
+                            if (!slide) return;
+                            const idx = slides.indexOf(slide);
+                            if (idx >= 0) {
+                                // 対応するドットも削除
+                                const dot = dots[idx];
+                                if (dot && dot.parentNode) dot.parentNode.removeChild(dot);
+                                if (slide && slide.parentNode) slide.parentNode.removeChild(slide);
+                                reindex();
+                                if (slides.length === 0) {
+                                    if (caseSection) caseSection.style.display = 'none';
+                                    return;
+                                }
+                                if (current >= slides.length) current = slides.length - 1;
+                                updateNavVisibility();
+                                show(current);
+                            }
+                        }, { once: true });
                     });
-                    // タイムアウトでもう一度判定（キャッシュやイベント取りこぼし対策）
-                    setTimeout(() => {
-                        if (loaded === 0) {
-                            errors = total;
-                            maybeHide();
-                        }
-                    }, 1200);
+
                     if (track && slides.length) {
-                        let current = 0;
-                        function show(i){
-                            if (i<0) i = slides.length-1;
-                            if (i>=slides.length) i = 0;
-                            current = i;
-                            track.style.display = 'flex';
-                            track.style.transform = `translateX(-${current*100}%)`;
-                            track.style.transition = 'transform .3s ease';
-                            slides.forEach(s=>{ s.style.minWidth='100%'; s.style.boxSizing='border-box'; });
-                            dots.forEach((d,idx)=>{ d.classList.toggle('active', idx===current); d.style.background = idx===current ? '#2CC7C5' : '#ccc'; });
+                        prevBtn && prevBtn.addEventListener('click', () => show(current - 1));
+                        nextBtn && nextBtn.addEventListener('click', () => show(current + 1));
+                        dots.forEach((d, idx) => d.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); show(idx); }));
+                        if (dotsWrap) {
+                            dotsWrap.addEventListener('click', (e) => {
+                                const el = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+                                if (!el) return;
+                                const dot = el.closest && el.closest('.case-dot');
+                                if (!dot) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const idxAttr = dot.getAttribute('data-index');
+                                const idx = idxAttr ? parseInt(idxAttr, 10) : Array.from(dotsWrap.querySelectorAll('.case-dot')).indexOf(dot);
+                                if (idx >= 0) show(idx);
+                            }, { capture: true });
                         }
-                        prevBtn && prevBtn.addEventListener('click', ()=>show(current-1));
-                        nextBtn && nextBtn.addEventListener('click', ()=>show(current+1));
-                        dots.forEach((d,idx)=> d.addEventListener('click', ()=>show(idx)));
+                        updateNavVisibility();
                         show(0);
                     }
                 } catch(e) {}
@@ -4219,6 +4271,12 @@ class RankingApp {
         const modalButton = document.getElementById('map-modal-button');
         
         if (modal && modalClinicName && modalAddress && modalAccess && modalMapContainer) {
+            // 変換コンテキストの影響を避けるため、body直下に移動（PCで左寄りになる問題の回避）
+            try {
+                if (modal.parentNode !== document.body) {
+                    document.body.appendChild(modal);
+                }
+            } catch (_) {}
             // まずモーダルを表示
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // スクロールを無効化
@@ -4293,9 +4351,11 @@ class RankingApp {
                     // ボタンテキストを設定
                     const buttonText = document.getElementById('map-modal-button-text');
                     if (buttonText) {
-                        // クリニック名を取得
-                        let clinicBaseName = clinicName || 'クリニック';
-                        buttonText.textContent = clinicBaseName + 'の公式サイト';
+                        // CTAは店舗名ではなくクリニック名のみを表示
+                        const ctaClinicName = (clinic && clinic.name)
+                            || (typeof clinicCode === 'string' && clinicCode)
+                            || 'クリニック';
+                        buttonText.textContent = ctaClinicName + 'の公式サイト';
                     }
                 } catch (error) {
                     // エラーが発生してもモーダルは表示されたままにする
@@ -4323,16 +4383,13 @@ class RankingApp {
 // 店舗の表示を切り替える関数（一度だけ開く）
 function toggleStores(button) {
     const targetId = button.getAttribute('data-target');
-    const targetShops = document.querySelector(targetId);
+    const root = button.closest('.clinic-detail-modal') || document;
+    const targetShops = root.querySelector(targetId) || document.querySelector(targetId);
+    if (!targetShops) return false;
     const hiddenShops = targetShops.querySelectorAll('.hidden-content');
-    
-    // 隠されている店舗を表示
-    hiddenShops.forEach(shop => {
-        shop.classList.remove('hidden');
-    });
-    
-    // ボタンを非表示にする（一度クリックしたら消える）
+    hiddenShops.forEach(shop => { shop.classList.remove('hidden'); });
     button.style.display = 'none';
+    return false;
 }
 
 // アプリケーションの初期化
@@ -4522,269 +4579,6 @@ function initializeDisclaimers() {
     }
 }
 
-// バナースライダーの初期化関数
-function initializeBannerSliders() {
-    const sliders = document.querySelectorAll('.banner-slider');
-    
-    sliders.forEach(slider => {
-        // すでに初期化済みのスライダーはスキップ（多重バインド防止）
-        if (slider.dataset.initialized === '1') return;
-        slider.dataset.initialized = '1';
-        const clinicId = slider.dataset.clinicId;
-        let slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
-        let dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
-        const dotsContainer = slider.querySelector('.slider-dots');
-        const prevBtn = slider.querySelector('.slider-prev');
-        const nextBtn = slider.querySelector('.slider-next');
-        const counter = slider.querySelector('.slider-counter');
-        const expandBtn = slider.querySelector('.slider-expand');
-        
-        // スライドが存在しなければ何もしない
-        if (!slidesArr || slidesArr.length === 0) return;
-
-        let currentIndex = 0;
-        let totalSlides = slidesArr.length;
-        
-        // 画像のURLを取得
-        const getImageUrls = () => Array.from(slider.querySelectorAll('.slider-slide')).map(slide => {
-            const img = slide.querySelector('img');
-            return img ? img.src : '';
-        });
-        let imageUrls = getImageUrls();
-
-        // 現在のアクティブインデックスを取得
-        const getActiveIndex = () => {
-            const idx = slidesArr.findIndex(s => s.classList.contains('active'));
-            return idx >= 0 ? idx : 0;
-        };
-        currentIndex = getActiveIndex();
-        
-        // 画像やスライド自体のクリックでも拡大モーダルを開く
-        slidesArr.forEach((slide) => {
-            const img = slide.querySelector('img');
-            const open = () => createAndShowModal(imageUrls, getActiveIndex());
-            if (img) {
-                img.style.cursor = 'zoom-in';
-                img.addEventListener('click', open);
-            } else {
-                slide.addEventListener('click', open);
-            }
-        });
-
-        // スライドを更新する関数
-        function updateSlider(index) {
-            // すべてのスライドとドットを非アクティブに
-            slidesArr.forEach(slide => slide.classList.remove('active'));
-            dotsArr.forEach(dot => dot.classList.remove('active'));
-            
-            // 現在のスライドとドットをアクティブに
-            slidesArr[index]?.classList.add('active');
-            if (dotsArr[index]) dotsArr[index].classList.add('active');
-            
-            // カウンターを更新
-            if (counter) {
-                counter.textContent = `${index + 1}/${totalSlides}`;
-            }
-            
-            currentIndex = index;
-        }
-
-        // ナビゲーションの表示/非表示を更新
-        function updateNavVisibility() {
-            const show = totalSlides > 1;
-            if (prevBtn) prevBtn.style.display = show ? '' : 'none';
-            if (nextBtn) nextBtn.style.display = show ? '' : 'none';
-            if (dotsContainer) dotsContainer.style.display = show ? '' : 'none';
-        }
-
-        // スライド・ドットの再インデックス化
-        function reindex() {
-            slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
-            dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
-            slidesArr.forEach((s, i) => s.setAttribute('data-index', String(i)));
-            dotsArr.forEach((d, i) => d.setAttribute('data-index', String(i)));
-            totalSlides = slidesArr.length;
-            imageUrls = getImageUrls();
-            updateNavVisibility();
-        }
-
-        // 読み込み失敗スライドの除去
-        function removeSlideAt(idx) {
-            const slide = slidesArr[idx];
-            const dot = dotsArr[idx];
-            if (slide) slide.remove();
-            if (dot) dot.remove();
-            reindex();
-            if (totalSlides === 0) return; // 全滅時
-            if (currentIndex >= totalSlides) currentIndex = totalSlides - 1;
-            updateSlider(currentIndex);
-        }
-
-        slidesArr.forEach((slide) => {
-            const img = slide.querySelector('img');
-            if (!img) return;
-            img.addEventListener('error', () => {
-                // 現在のインデックスを data-index から取得
-                const idxAttr = slide.getAttribute('data-index');
-                const idx = idxAttr ? parseInt(idxAttr, 10) : slidesArr.indexOf(slide);
-                if (idx >= 0) removeSlideAt(idx);
-            }, { once: true });
-        });
-        
-        // 前へボタン
-        if (prevBtn) {
-            prevBtn.addEventListener('click', () => {
-                const newIndex = currentIndex === 0 ? totalSlides - 1 : currentIndex - 1;
-                updateSlider(newIndex);
-            });
-        }
-        
-        // 次へボタン
-        if (nextBtn) {
-            nextBtn.addEventListener('click', () => {
-                const newIndex = currentIndex === totalSlides - 1 ? 0 : currentIndex + 1;
-                updateSlider(newIndex);
-            });
-        }
-        
-        // ドットクリック
-        dotsArr.forEach((dot) => {
-            dot.addEventListener('click', () => {
-                const idxAttr = dot.getAttribute('data-index');
-                const idx = idxAttr ? parseInt(idxAttr, 10) : dotsArr.indexOf(dot);
-                updateSlider(Math.max(0, idx));
-            });
-        });
-        
-        // 画像拡大ボタン - モーダル表示
-        if (expandBtn) {
-            expandBtn.addEventListener('click', () => {
-                createAndShowModal(imageUrls, getActiveIndex());
-            });
-        }
-
-        // 初期表示を同期（activeが付いていない場合は0に）
-        updateSlider(getActiveIndex());
-        updateNavVisibility();
-    });
-}
-
-// モーダル作成と表示
-function createAndShowModal(imageUrls, startIndex) {
-    // 既存のモーダルがあれば削除
-    const existingModal = document.querySelector('.banner-modal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    // モーダルHTML作成
-    const modalHtml = `
-        <div class="banner-modal active">
-            <button class="banner-modal-close">&times;</button>
-            <button class="banner-modal-nav banner-modal-prev">‹</button>
-            <div class="banner-modal-content">
-                <img class="banner-modal-image" src="${imageUrls[startIndex]}" alt="拡大画像">
-                <div class="banner-modal-counter">${startIndex + 1}/${imageUrls.length}</div>
-            </div>
-            <button class="banner-modal-nav banner-modal-next">›</button>
-            <div class="banner-modal-dots">
-                ${imageUrls.map((_, idx) => `
-                    <button class="banner-modal-dot ${idx === startIndex ? 'active' : ''}" data-index="${idx}" aria-label="${idx + 1}"></button>
-                `).join('')}
-            </div>
-        </div>
-    `;
-    
-    // モーダルをbodyに追加
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
-    const modal = document.querySelector('.banner-modal');
-    const modalImage = modal.querySelector('.banner-modal-image');
-    const modalCounter = modal.querySelector('.banner-modal-counter');
-    const closeBtn = modal.querySelector('.banner-modal-close');
-    const prevBtn = modal.querySelector('.banner-modal-prev');
-    const nextBtn = modal.querySelector('.banner-modal-next');
-    const modalDots = modal.querySelectorAll('.banner-modal-dot');
-    const modalDotsWrap = modal.querySelector('.banner-modal-dots');
-    
-    let currentModalIndex = startIndex;
-    
-    // モーダル内のスライド更新
-    function updateModalSlide(index) {
-        modalImage.src = imageUrls[index];
-        modalCounter.textContent = `${index + 1}/${imageUrls.length}`;
-        currentModalIndex = index;
-        // ドットのアクティブ状態を更新
-        if (modalDots && modalDots.length) {
-            modalDots.forEach((d, i) => {
-                if (i === index) d.classList.add('active');
-                else d.classList.remove('active');
-            });
-        }
-    }
-    
-    // 閉じるボタン
-    closeBtn.addEventListener('click', () => {
-        modal.remove();
-    });
-    
-    // モーダル背景クリックで閉じる
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.remove();
-        }
-    });
-    
-    // 前へボタン
-    prevBtn.addEventListener('click', () => {
-        const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
-        updateModalSlide(newIndex);
-    });
-    
-    // 次へボタン
-    nextBtn.addEventListener('click', () => {
-        const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
-        updateModalSlide(newIndex);
-    });
-    
-    // ドットクリック
-    if (modalDots && modalDots.length) {
-        modalDots.forEach((dot) => {
-            dot.addEventListener('click', () => {
-                const idx = parseInt(dot.getAttribute('data-index'), 10) || 0;
-                updateModalSlide(idx);
-            });
-        });
-    }
-    
-    // 1枚しかない場合は矢印とドットを非表示
-    if (imageUrls.length <= 1) {
-        if (prevBtn) prevBtn.style.display = 'none';
-        if (nextBtn) nextBtn.style.display = 'none';
-        if (modalDotsWrap) modalDotsWrap.style.display = 'none';
-    }
-    
-    // キーボード操作（ESCで閉じる／左右矢印で移動）
-    const handleKey = (e) => {
-        if (e.key === 'Escape') {
-            modal.remove();
-            document.removeEventListener('keydown', handleKey);
-            return;
-        }
-        if (e.key === 'ArrowLeft') {
-            const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
-            updateModalSlide(newIndex);
-            return;
-        }
-        if (e.key === 'ArrowRight') {
-            const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
-            updateModalSlide(newIndex);
-            return;
-        }
-    };
-    document.addEventListener('keydown', handleKey);
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     
     const app = new RankingApp();
@@ -4797,30 +4591,71 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeDisclaimers();
     }, 100);
     
-    // バナースライダーの初期化
+    // バナースライダーの初期化（potenza002同等）
     setTimeout(() => {
-        initializeBannerSliders();
+        try { initializeBannerSliders(); } catch (_) {}
     }, 200);
     
     // デバッグ用：グローバル関数として公開
     window.testInitializeDisclaimers = initializeDisclaimers;
+    // モーダル操作関数も明示的に公開（環境差分対策）
+    window.openClinicDetailModal = openClinicDetailModal;
+    window.closeClinicDetailModal = closeClinicDetailModal;
+
+    // 確認事項トグルのスコープ対応（モーダル優先で動作）
+    window.toggleClinicDisclaimer = function(uniqueSlug, event) {
+        if (event) { event.preventDefault?.(); event.stopPropagation?.(); }
+        const modalRoot = document.querySelector('.clinic-detail-modal');
+        const root = (event && event.target && event.target.closest('.clinic-detail-modal')) || modalRoot || document;
+        const content = root.querySelector(`#${uniqueSlug}-content`) || document.querySelector(`#${uniqueSlug}-content`);
+        const arrow = root.querySelector(`#${uniqueSlug}-arrow`) || document.querySelector(`#${uniqueSlug}-arrow`);
+        if (content) {
+            const isHidden = (getComputedStyle(content).display === 'none' || content.style.display === 'none');
+            content.style.display = isHidden ? 'block' : 'none';
+            if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        return false;
+    };
+    window.toggleDisclaimer = function(clinicSlug) {
+        const modalRoot = document.querySelector('.clinic-detail-modal');
+        const root = modalRoot || document;
+        const content = root.querySelector(`#${clinicSlug}-content`) || document.querySelector(`#${clinicSlug}-content`);
+        const arrow = root.querySelector(`#${clinicSlug}-arrow`) || document.querySelector(`#${clinicSlug}-arrow`);
+        if (content) {
+            const isHidden = (getComputedStyle(content).display === 'none' || content.style.display === 'none');
+            content.style.display = isHidden ? 'block' : 'none';
+            if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        return false;
+    };
     
     // 初期化後にも一度詳細リンクをチェック
     setTimeout(() => {
         const allDetailLinks = document.querySelectorAll('a[href*="#clinic"]');
         
         // #clinicを含むリンクにイベントリスナーを追加
-        allDetailLinks.forEach((link, index) => {
+        allDetailLinks.forEach((link) => {
             link.addEventListener('click', (e) => {
-                // デフォルトの動作（アンカーリンクへのジャンプ）は維持
+                const href = link.getAttribute('href') || '';
+                const m = href.match(/#clinic(\d+)/);
+                if (m) {
+                    e.preventDefault();
+                    const rank = parseInt(m[1], 10);
+                    if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
+                }
             });
         });
         
-        // グローバルなクリックイベントリスナーも追加（デバッグ用）
+        // 追加のフォールバック: #clinicリンク全般をグローバルに捕捉（キャプチャ段階）
         document.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A' && (e.target.textContent.includes('詳細を見る') || e.target.textContent.includes('詳細をみる'))) {
-                // Track detail link click
-            }
+            const a = e.target.closest('a[href*="#clinic"]');
+            if (!a) return;
+            const href = a.getAttribute('href') || '';
+            const m = href.match(/#clinic(\d+)/);
+            if (!m) return;
+            e.preventDefault();
+            const rank = parseInt(m[1], 10);
+            if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
         }, true);
     }, 500);
     
@@ -4841,123 +4676,354 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // ランキング読込後にフッター追従ポップをセットアップ
-    setTimeout(() => {
-        try { setupFooterFollowPopup(); } catch(_) {}
-    }, 700);
 });
 
-// フッター追従ポップ生成・制御
-function setupFooterFollowPopup() {
-    const dm = window.app?.dataManager || window.dataManager;
-    const urlHandler = window.app?.urlHandler || new UrlParamHandler();
-    if (!dm) return;
+// バナースライダーの初期化関数（potenza002から移植）
+function initializeBannerSliders() {
+    const sliders = document.querySelectorAll('.banner-slider');
+    sliders.forEach(slider => {
+        if (slider.dataset.initialized === '1') return; // 多重初期化防止
+        slider.dataset.initialized = '1';
+        let slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+        let dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+        const dotsContainer = slider.querySelector('.slider-dots');
+        const prevBtn = slider.querySelector('.slider-prev');
+        const nextBtn = slider.querySelector('.slider-next');
+        const counter = slider.querySelector('.slider-counter');
+        const expandBtn = slider.querySelector('.slider-expand');
 
-    // コンテナ生成
-    let popup = document.querySelector('.footer-follow-popup');
-    if (!popup) {
-        popup = document.createElement('div');
-        popup.className = 'footer-follow-popup';
-        popup.innerHTML = `
-            <button class="popup-close" aria-label="閉じる">×</button>
-            <div class="popup-inner">
-                <div class="popup-left">
-                    <img class="popup-logo" alt="おすすめクリニック" />
-                }
-                <div class="popup-right">
-                    <a href="#" class="fixed-mail-hankyo-button popup-link" target="_blank" rel="noopener">
-                        <div class="fixed-mail-hankyo-button__tag">無料</div>
-                        <div class="fixed-mail-hankyo-button__inner">
-                            <div class="fixed-mail-hankyo-button__inner__text">
-                                <div class="fixed-mail-hankyo-button__inner__text__sub">カウンセリングを</div>
-                                <div class="fixed-mail-hankyo-button__inner__text__main">予約する</div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(popup);
-    }
+        if (!slidesArr || slidesArr.length === 0) return;
 
-    const imgEl = popup.querySelector('.popup-logo');
-    const linkEl = popup.querySelector('.popup-link');
-    const closeBtn = popup.querySelector('.popup-close');
+        let currentIndex = 0;
+        let totalSlides = slidesArr.length;
+        const getImageUrls = () => Array.from(slider.querySelectorAll('.slider-slide')).map(slide => {
+            const img = slide.querySelector('img');
+            return img ? img.src : '';
+        });
+        let imageUrls = getImageUrls();
+        const getActiveIndex = () => {
+            const idx = slidesArr.findIndex(s => s.classList.contains('active'));
+            return idx >= 0 ? idx : 0;
+        };
+        currentIndex = getActiveIndex();
 
-    // ランキングから1位クリニックを取得
-    const regionIdRaw = window.app?.currentRegionId || new UrlParamHandler().getRegionId() || '13';
-    const regionId = String(parseInt(regionIdRaw, 10));
-    const ranking = dm.getRankingByRegionId(regionId);
-    const firstId = ranking?.ranks?.no1;
-    if (!firstId) {
-        // データ未準備時はリトライ
-        setTimeout(setupFooterFollowPopup, 500);
-        return;
-    }
-
-    const clinicCode = dm.getClinicCodeById(firstId);
-    const clinic = (dm.clinics || []).find(c => c.id == firstId);
-    const logoFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
-
-    // ロゴ候補をCSV最優先で構築
-    const candidates = [];
-    const csvLogo = dm.getClinicText(clinicCode, 'ロゴ画像パス', '');
-    if (csvLogo) candidates.push(csvLogo);
-    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.webp`);
-    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.jpg`);
-    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.png`);
-
-    // 画像フォールバック（順に試す）
-    function setNextSrc(list, idx) {
-        if (!imgEl) return;
-        if (idx >= list.length) {
-            // 画像がなければ画像だけ非表示
-            imgEl.style.display = 'none';
-            return;
-        }
-        imgEl.src = list[idx];
-        imgEl.alt = clinic?.name || 'おすすめクリニック';
-        imgEl.onerror = () => setNextSrc(list, idx+1);
-    }
-    setNextSrc(Array.from(new Set(candidates)), 0);
-
-    // 公式リンク
-    if (linkEl) {
-        linkEl.href = urlHandler.getClinicUrlWithRegionId(firstId, 1);
-    }
-
-    // 閉じる（セッション内で再表示しない）
-    closeBtn?.addEventListener('click', () => {
-        popup.classList.remove('visible');
-        sessionStorage.setItem('footerPopupClosed', '1');
-    });
-
-    // スクロールで表示制御（10%で表示）
-    let ticking = false;
-    function onScroll() {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-            ticking = false;
-            if (sessionStorage.getItem('footerPopupClosed') === '1') {
-                popup.classList.remove('visible');
-                return;
+        // 画像クリックで拡大モーダル
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            const open = () => createAndShowModal(imageUrls, getActiveIndex());
+            if (img) {
+                img.style.cursor = 'zoom-in';
+                img.addEventListener('click', open);
+            } else {
+                slide.addEventListener('click', open);
             }
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
-            const docHeight = Math.max(
-                document.body.scrollHeight,
-                document.documentElement.scrollHeight
-            ) - window.innerHeight;
-            const depth = docHeight > 0 ? scrollTop / docHeight : 0;
-            if (depth >= 0.10) popup.classList.add('visible');
-            else popup.classList.remove('visible');
+        });
+
+        function updateSlider(index) {
+            slidesArr.forEach(slide => slide.classList.remove('active'));
+            dotsArr.forEach(dot => dot.classList.remove('active'));
+            slidesArr[index]?.classList.add('active');
+            if (dotsArr[index]) dotsArr[index].classList.add('active');
+            if (counter) counter.textContent = `${index + 1}/${totalSlides}`;
+            currentIndex = index;
+        }
+
+        function updateNavVisibility() {
+            const show = totalSlides > 1;
+            if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+            if (dotsContainer) dotsContainer.style.display = show ? '' : 'none';
+        }
+
+        function reindex() {
+            slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+            dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+            slidesArr.forEach((s, i) => s.setAttribute('data-index', String(i)));
+            dotsArr.forEach((d, i) => d.setAttribute('data-index', String(i)));
+            totalSlides = slidesArr.length;
+            imageUrls = getImageUrls();
+            updateNavVisibility();
+        }
+
+        function removeSlideAt(idx) {
+            const slide = slidesArr[idx];
+            const dot = dotsArr[idx];
+            if (slide) slide.remove();
+            if (dot) dot.remove();
+            reindex();
+            if (totalSlides === 0) return;
+            if (currentIndex >= totalSlides) currentIndex = totalSlides - 1;
+            updateSlider(currentIndex);
+        }
+
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            if (!img) return;
+            img.addEventListener('error', () => {
+                const idxAttr = slide.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : slidesArr.indexOf(slide);
+                if (idx >= 0) removeSlideAt(idx);
+            }, { once: true });
+        });
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === 0 ? totalSlides - 1 : currentIndex - 1;
+                updateSlider(newIndex);
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === totalSlides - 1 ? 0 : currentIndex + 1;
+                updateSlider(newIndex);
+            });
+        }
+
+        dotsArr.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idxAttr = dot.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : dotsArr.indexOf(dot);
+                updateSlider(Math.max(0, idx));
+            });
+        });
+
+        if (expandBtn) {
+            expandBtn.addEventListener('click', () => {
+                createAndShowModal(imageUrls, getActiveIndex());
+            });
+        }
+
+        updateSlider(getActiveIndex());
+        updateNavVisibility();
+    });
+}
+
+// バナー拡大モーダル（potenza002から移植）
+function createAndShowModal(imageUrls, startIndex) {
+    const existingModal = document.querySelector('.banner-modal');
+    if (existingModal) existingModal.remove();
+
+    const modalHtml = `
+        <div class="banner-modal active">
+            <button class="banner-modal-close">&times;</button>
+            <button class="banner-modal-nav banner-modal-prev">‹</button>
+            <div class="banner-modal-content">
+                <img class="banner-modal-image" src="${imageUrls[startIndex]}" alt="拡大画像">
+                <div class="banner-modal-counter">${startIndex + 1}/${imageUrls.length}</div>
+            </div>
+            <button class="banner-modal-nav banner-modal-next">›</button>
+            <div class="banner-modal-dots">
+                ${imageUrls.map((_, idx) => `
+                    <button class="banner-modal-dot ${idx === startIndex ? 'active' : ''}" data-index="${idx}" aria-label="${idx + 1}"></button>
+                `).join('')}
+            </div>
+        </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = document.querySelector('.banner-modal');
+    const modalImage = modal.querySelector('.banner-modal-image');
+    const modalCounter = modal.querySelector('.banner-modal-counter');
+    const closeBtn = modal.querySelector('.banner-modal-close');
+    const prevBtn = modal.querySelector('.banner-modal-prev');
+    const nextBtn = modal.querySelector('.banner-modal-next');
+    const modalDots = modal.querySelectorAll('.banner-modal-dot');
+    const modalDotsWrap = modal.querySelector('.banner-modal-dots');
+
+    let currentModalIndex = startIndex;
+    function updateModalSlide(index) {
+        modalImage.src = imageUrls[index];
+        modalCounter.textContent = `${index + 1}/${imageUrls.length}`;
+        currentModalIndex = index;
+        if (modalDots && modalDots.length) {
+            modalDots.forEach((d, i) => {
+                if (i === index) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+        }
+    }
+
+    closeBtn.addEventListener('click', () => { modal.remove(); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    prevBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+        updateModalSlide(newIndex);
+    });
+    nextBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+        updateModalSlide(newIndex);
+    });
+    if (modalDots && modalDots.length) {
+        modalDots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.getAttribute('data-index'), 10) || 0;
+                updateModalSlide(idx);
+            });
         });
     }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    // 初回評価
-    onScroll();
+    if (imageUrls.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (modalDotsWrap) modalDotsWrap.style.display = 'none';
+    }
 
-    // 初期化完了フラグ
-    window._footerPopupInitialized = true;
+    const handleKey = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleKey);
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+    };
+    document.addEventListener('keydown', handleKey);
+}
+
+// クリニック詳細モーダル（ボトムシート）
+function openClinicDetailModal(rank) {
+    closeClinicDetailModal();
+    const target = document.getElementById(`clinic${rank}`);
+    if (!target) return;
+    const contentRoot = target.querySelector('.ranking_box_in') || target;
+    const contentHtml = contentRoot.outerHTML;
+    // クリニック名を特定
+    let clinicNameForHeader = 'クリニック';
+    try {
+        const clinicIdAttr = target.getAttribute('data-clinic-id');
+        if (clinicIdAttr && window.dataManager && Array.isArray(window.dataManager.clinics)) {
+            const c = window.dataManager.clinics.find(x => String(x.id) === String(clinicIdAttr));
+            if (c && c.name) clinicNameForHeader = c.name;
+        }
+        if (clinicNameForHeader === 'クリニック') {
+            const nameFromDom = target.querySelector('.ranking__name a')?.textContent?.replace(/\s*＞\s*$/, '')?.trim();
+            if (nameFromDom) clinicNameForHeader = nameFromDom;
+        }
+    } catch (_) {}
+
+    const overlayHtml = '<div class="clinic-detail-overlay"></div>';
+    const modalHtml = `
+        <div class="clinic-detail-modal" role="dialog" aria-modal="true" aria-label="${clinicNameForHeader}の詳細">
+            <button class="clinic-detail-close" aria-label="閉じる">&times;</button>
+            <header>
+                <div style="font-size:17px;color:#333;">${clinicNameForHeader}の詳細</div>
+            </header>
+            <div class="clinic-detail-body">
+                ${contentHtml}
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', overlayHtml + modalHtml);
+    const overlay = document.querySelector('.clinic-detail-overlay');
+    const modal = document.querySelector('.clinic-detail-modal');
+    // バナースライダーの多重初期化ガード属性を除去して再初期化可能にする
+    if (modal) {
+        const modalSliders = modal.querySelectorAll('.banner-slider');
+        modalSliders.forEach((s) => {
+            s.removeAttribute('data-initialized');
+        });
+    }
+    requestAnimationFrame(() => {
+        overlay?.classList.add('active');
+        modal?.classList.add('active');
+        document.body.classList.add('no-scroll');
+        try { initializeBannerSliders(); } catch (_) {}
+        try { initializeCaseSliderIn(modal); } catch (_) {}
+    });
+
+    const cleanup = () => { closeClinicDetailModal(); };
+    overlay?.addEventListener('click', cleanup);
+    modal?.querySelector('.clinic-detail-close')?.addEventListener('click', cleanup);
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(); };
+    document.addEventListener('keydown', onKey, { once: true });
+}
+
+function closeClinicDetailModal() {
+    const overlay = document.querySelector('.clinic-detail-overlay');
+    const modal = document.querySelector('.clinic-detail-modal');
+    if (overlay) overlay.parentNode.removeChild(overlay);
+    if (modal) modal.parentNode.removeChild(modal);
+    document.body.classList.remove('no-scroll');
+}
+
+// 症例スライダー（モーダル内）簡易初期化
+function initializeCaseSliderIn(root) {
+    if (!root) return;
+    const slider = root.querySelector('.case-slider');
+    if (!slider) return;
+    const track = slider.querySelector('.case-track');
+    if (!track) return;
+    let slides = Array.from(slider.querySelectorAll('.case-slide'));
+    const dotsWrap = root.querySelector('.case-dots');
+    let dots = Array.from(root.querySelectorAll('.case-dot'));
+    const prevBtn = slider.querySelector('.case-nav-prev');
+    const nextBtn = slider.querySelector('.case-nav-next');
+    if (!slides.length) return;
+    let current = 0;
+    const reindex = () => {
+        slides = Array.from(slider.querySelectorAll('.case-slide'));
+        dots = Array.from(root.querySelectorAll('.case-dot'));
+        dots.forEach((d, i) => d.setAttribute('data-index', String(i)));
+    };
+    const updateNavVisibility = () => {
+        const show = slides.length > 1;
+        if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+        if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+        if (dotsWrap) dotsWrap.style.display = show ? 'block' : 'none';
+    };
+    const show = (i) => {
+        if (!slides.length || !track) return;
+        if (i < 0) i = slides.length - 1;
+        if (i >= slides.length) i = 0;
+        current = i;
+        track.style.display = 'flex';
+        track.style.transform = `translateX(-${current * 100}%)`;
+        track.style.transition = 'transform .3s ease';
+        slides.forEach(s => { s.style.minWidth = '100%'; s.style.boxSizing = 'border-box'; });
+        dots.forEach((d, idx) => {
+            d.classList.toggle('active', idx === current);
+            d.style.background = (idx === current ? '#2CC7C5' : '#ccc');
+        });
+    };
+    const imgs = Array.from(slider.querySelectorAll('img'));
+    imgs.forEach((img) => {
+        img.addEventListener('error', () => {
+            const slide = img.closest('.case-slide');
+            if (!slide) return;
+            const idx = slides.indexOf(slide);
+            if (idx >= 0) {
+                const dot = dots[idx];
+                if (dot && dot.parentNode) dot.parentNode.removeChild(dot);
+                if (slide && slide.parentNode) slide.parentNode.removeChild(slide);
+                reindex();
+                if (!slides.length) return;
+                if (current >= slides.length) current = slides.length - 1;
+                updateNavVisibility();
+                show(current);
+            }
+        }, { once: true });
+    });
+    prevBtn && prevBtn.addEventListener('click', () => show(current - 1));
+    nextBtn && nextBtn.addEventListener('click', () => show(current + 1));
+    dots.forEach((d, idx) => d.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); show(idx); }));
+    if (dotsWrap) {
+        dotsWrap.addEventListener('click', (e) => {
+            const el = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+            if (!el) return;
+            const dot = el.closest && el.closest('.case-dot');
+            if (!dot) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const idxAttr = dot.getAttribute('data-index');
+            const idx = idxAttr ? parseInt(idxAttr, 10) : Array.from(dotsWrap.querySelectorAll('.case-dot')).indexOf(dot);
+            if (idx >= 0) show(idx);
+        }, { capture: true });
+    }
+    updateNavVisibility();
+    show(0);
 }
