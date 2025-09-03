@@ -4951,6 +4951,71 @@ function closeClinicDetailModal() {
     document.body.classList.remove('no-scroll');
 }
 
+// スクロール追従モーダル
+function initializeScrollModal() {
+    // 既存のモーダルがあれば削除
+    const existingModal = document.querySelector('.scroll-bottom-modal');
+    if (existingModal) existingModal.remove();
+
+    // モーダルのHTML作成
+    const modalHtml = `
+        <div class="scroll-bottom-modal">
+            <button class="scroll-modal-close">&times;</button>
+            <div class="scroll-modal-content">
+                <div class="scroll-modal-text">
+                    <span class="scroll-modal-badge">期間限定</span>
+                    <p>今なら特別キャンペーン実施中！</p>
+                </div>
+                <a href="#ranking" class="scroll-modal-btn">詳細を見る</a>
+            </div>
+        </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = document.querySelector('.scroll-bottom-modal');
+    const closeBtn = modal.querySelector('.scroll-modal-close');
+    
+    let hasShown = false;
+    let isClosed = false;
+
+    // モーダルを表示する関数
+    function showModal() {
+        if (!hasShown && !isClosed) {
+            modal.classList.add('show');
+            hasShown = true;
+        }
+    }
+
+    // モーダルを非表示にする関数
+    function hideModal() {
+        modal.classList.remove('show');
+        isClosed = true;
+    }
+
+    // 閉じるボタンのクリックイベント
+    closeBtn.addEventListener('click', hideModal);
+
+    // スクロールイベント
+    function checkScroll() {
+        if (isClosed) return;
+        
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const windowHeight = window.innerHeight;
+        const documentHeight = document.documentElement.scrollHeight;
+        const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
+        
+        // 10%以上スクロールしたら表示
+        if (scrollPercentage >= 10) {
+            showModal();
+        }
+    }
+
+    // スクロールイベントリスナー
+    window.addEventListener('scroll', checkScroll);
+    
+    // 初回チェック
+    checkScroll();
+}
+
 // 症例スライダー（モーダル内）簡易初期化
 function initializeCaseSliderIn(root) {
     if (!root) return;
@@ -5027,3 +5092,11 @@ function initializeCaseSliderIn(root) {
     updateNavVisibility();
     show(0);
 }
+
+// DOMContentLoaded時にスクロールモーダルを初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // 既存の初期化処理の後に追加
+    setTimeout(() => {
+        initializeScrollModal();
+    }, 1000); // 1秒後に初期化
+});
