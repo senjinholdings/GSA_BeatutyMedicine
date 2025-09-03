@@ -2793,7 +2793,7 @@ class RankingApp {
                     
                     td.className = 'ranking-table_td1';
                     td.innerHTML = `
-                        <img src="${logoPath}" alt="${clinic.name}" width="80">
+                        <img src="${logoPath}" alt="${clinic.name}" width="80" data-rank="${rankNum}" class="comparison-logo">
                         <a href="#" ${clinicNameOnclick} class="clinic-link" style="cursor: pointer;">${clinic.name}</a>
                     `;
                 } else if (fieldName === 'comparison1') {
@@ -3402,6 +3402,24 @@ class RankingApp {
                             const m = href.match(/#clinic(\d+)/);
                             if (m) rank = parseInt(m[1], 10);
                         }
+                        if (rank && !Number.isNaN(rank)) {
+                            openClinicDetailModal(rank);
+                        }
+                    });
+                }
+            });
+
+            // 比較表のロゴ画像クリックでもモーダルを開く
+            const logoImgs = document.querySelectorAll('#comparison-table td.ranking-table_td1 img.comparison-logo');
+            logoImgs.forEach(img => {
+                if (!img.hasAttribute('data-listener-attached')) {
+                    img.setAttribute('data-listener-attached', 'true');
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const rankAttr = img.getAttribute('data-rank');
+                        const rank = parseInt(rankAttr, 10);
                         if (rank && !Number.isNaN(rank)) {
                             openClinicDetailModal(rank);
                         }
@@ -4875,13 +4893,26 @@ function openClinicDetailModal(rank) {
     if (!target) return;
     const contentRoot = target.querySelector('.ranking_box_in') || target;
     const contentHtml = contentRoot.outerHTML;
+    // クリニック名を特定
+    let clinicNameForHeader = 'クリニック';
+    try {
+        const clinicIdAttr = target.getAttribute('data-clinic-id');
+        if (clinicIdAttr && window.dataManager && Array.isArray(window.dataManager.clinics)) {
+            const c = window.dataManager.clinics.find(x => String(x.id) === String(clinicIdAttr));
+            if (c && c.name) clinicNameForHeader = c.name;
+        }
+        if (clinicNameForHeader === 'クリニック') {
+            const nameFromDom = target.querySelector('.ranking__name a')?.textContent?.replace(/\s*＞\s*$/, '')?.trim();
+            if (nameFromDom) clinicNameForHeader = nameFromDom;
+        }
+    } catch (_) {}
 
     const overlayHtml = '<div class="clinic-detail-overlay"></div>';
     const modalHtml = `
-        <div class="clinic-detail-modal" role="dialog" aria-modal="true" aria-label="クリニック詳細">
+        <div class="clinic-detail-modal" role="dialog" aria-modal="true" aria-label="${clinicNameForHeader}の詳細">
+            <button class="clinic-detail-close" aria-label="閉じる">&times;</button>
             <header>
-                <div style="font-size:14px;color:#333;">クリニック詳細</div>
-                <button class="clinic-detail-close" aria-label="閉じる">&times;</button>
+                <div style="font-size:17px;color:#333;">${clinicNameForHeader}の詳細</div>
             </header>
             <div class="clinic-detail-body">
                 ${contentHtml}
