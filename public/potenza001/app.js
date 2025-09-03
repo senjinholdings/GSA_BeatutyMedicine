@@ -2244,6 +2244,12 @@ class RankingApp {
             
             // 詳細コンテンツの更新 (正規化されたIDを使用)
             this.updateClinicDetails(allClinics, ranking, normalizedRegionId);
+
+            // ランキング詳細DOM挿入後にバナースライダーを確実に初期化
+            // （initializeBannerSlidersは多重初期化ガード付き）
+            setTimeout(() => {
+                try { initializeBannerSliders(); } catch (_) {}
+            }, 0);
             
             // 比較表の注釈を更新（1位〜5位）
             setTimeout(() => {
@@ -3528,15 +3534,52 @@ class RankingApp {
                         </div>
                     </div>
                 ${(() => {
-                    // DataManagerからバナーパスを動的に取得
+                    // DataManagerからバナー画像パス候補を生成（CSV指定 + bnr2以降）
                     const clinicCode = this.dataManager.getClinicCodeById(clinicId);
                     const bannerFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
-                    const correctBanner = data.banner || `../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr.webp`;
-                    return correctBanner ? `
-                    <div class="detail-banner">
-                        <img src="${correctBanner}" alt="${clinic.name}キャンペーン">
+                    // ベース（*_detail_bnr.webp）は使用しない。CSV指定と *_detail_bnr2.webp 以降を使用
+                    const candidates = [];
+                    const csvBannerRaw = this.dataManager.getClinicText(clinicCode, '詳細バナー画像パス', '');
+                    if (csvBannerRaw) {
+                        candidates.push(csvBannerRaw);
+                    }
+                    for (let i = 2; i <= 10; i++) {
+                        candidates.push(`../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr${i}.webp`);
+                    }
+                    const bannerImages = Array.from(new Set(candidates));
+                    if (!bannerImages.length) return '';
+
+                    return `
+                    <div class="detail-banner banner-slider" data-clinic-id="${clinicId}">
+                        <div class="slider-container">
+                            <div class="slider-counter">1/${bannerImages.length}</div>
+                            <button class="slider-nav slider-prev" data-clinic-id="${clinicId}">
+                                <span>‹</span>
+                            </button>
+                            <div class="slider-wrapper">
+                                <div class="slider-track" data-clinic-id="${clinicId}">
+                                    ${bannerImages.map((img, index) => `
+                                        <div class=\"slider-slide ${index === 0 ? 'active' : ''}\" data-index=\"${index}\">
+                                            <img src=\"${img}\" alt=\"${clinic.name}キャンペーン${index + 1}\">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <button class="slider-nav slider-next" data-clinic-id="${clinicId}">
+                                <span>›</span>
+                            </button>
+                            <button class="slider-expand" data-clinic-id="${clinicId}">
+                                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                                <span>画像を拡大</span>
+                            </button>
+                        </div>
+                        <div class="slider-dots">
+                            ${bannerImages.map((_, index) => `
+                                <button class="slider-dot ${index === 0 ? 'active' : ''}" data-index="${index}" data-clinic-id="${clinicId}"></button>
+                            `).join('')}
+                        </div>
                     </div>
-                    ` : '';
+                    `;
                 })()}
                 <div class="detail-features">
                     ${data.features.map(feature => `<span class="feature-tag">${this.dataManager.processDecoTags(feature.startsWith('#') ? feature : '# ' + feature)}</span>`).join('')}
@@ -4485,6 +4528,11 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeDisclaimers();
     }, 100);
     
+    // バナースライダーの初期化（potenza002同等）
+    setTimeout(() => {
+        try { initializeBannerSliders(); } catch (_) {}
+    }, 200);
+    
     // デバッグ用：グローバル関数として公開
     window.testInitializeDisclaimers = initializeDisclaimers;
     
@@ -4525,3 +4573,211 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// バナースライダーの初期化関数（potenza002から移植）
+function initializeBannerSliders() {
+    const sliders = document.querySelectorAll('.banner-slider');
+    sliders.forEach(slider => {
+        if (slider.dataset.initialized === '1') return; // 多重初期化防止
+        slider.dataset.initialized = '1';
+        let slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+        let dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+        const dotsContainer = slider.querySelector('.slider-dots');
+        const prevBtn = slider.querySelector('.slider-prev');
+        const nextBtn = slider.querySelector('.slider-next');
+        const counter = slider.querySelector('.slider-counter');
+        const expandBtn = slider.querySelector('.slider-expand');
+
+        if (!slidesArr || slidesArr.length === 0) return;
+
+        let currentIndex = 0;
+        let totalSlides = slidesArr.length;
+        const getImageUrls = () => Array.from(slider.querySelectorAll('.slider-slide')).map(slide => {
+            const img = slide.querySelector('img');
+            return img ? img.src : '';
+        });
+        let imageUrls = getImageUrls();
+        const getActiveIndex = () => {
+            const idx = slidesArr.findIndex(s => s.classList.contains('active'));
+            return idx >= 0 ? idx : 0;
+        };
+        currentIndex = getActiveIndex();
+
+        // 画像クリックで拡大モーダル
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            const open = () => createAndShowModal(imageUrls, getActiveIndex());
+            if (img) {
+                img.style.cursor = 'zoom-in';
+                img.addEventListener('click', open);
+            } else {
+                slide.addEventListener('click', open);
+            }
+        });
+
+        function updateSlider(index) {
+            slidesArr.forEach(slide => slide.classList.remove('active'));
+            dotsArr.forEach(dot => dot.classList.remove('active'));
+            slidesArr[index]?.classList.add('active');
+            if (dotsArr[index]) dotsArr[index].classList.add('active');
+            if (counter) counter.textContent = `${index + 1}/${totalSlides}`;
+            currentIndex = index;
+        }
+
+        function updateNavVisibility() {
+            const show = totalSlides > 1;
+            if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+            if (dotsContainer) dotsContainer.style.display = show ? '' : 'none';
+        }
+
+        function reindex() {
+            slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+            dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+            slidesArr.forEach((s, i) => s.setAttribute('data-index', String(i)));
+            dotsArr.forEach((d, i) => d.setAttribute('data-index', String(i)));
+            totalSlides = slidesArr.length;
+            imageUrls = getImageUrls();
+            updateNavVisibility();
+        }
+
+        function removeSlideAt(idx) {
+            const slide = slidesArr[idx];
+            const dot = dotsArr[idx];
+            if (slide) slide.remove();
+            if (dot) dot.remove();
+            reindex();
+            if (totalSlides === 0) return;
+            if (currentIndex >= totalSlides) currentIndex = totalSlides - 1;
+            updateSlider(currentIndex);
+        }
+
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            if (!img) return;
+            img.addEventListener('error', () => {
+                const idxAttr = slide.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : slidesArr.indexOf(slide);
+                if (idx >= 0) removeSlideAt(idx);
+            }, { once: true });
+        });
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === 0 ? totalSlides - 1 : currentIndex - 1;
+                updateSlider(newIndex);
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === totalSlides - 1 ? 0 : currentIndex + 1;
+                updateSlider(newIndex);
+            });
+        }
+
+        dotsArr.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idxAttr = dot.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : dotsArr.indexOf(dot);
+                updateSlider(Math.max(0, idx));
+            });
+        });
+
+        if (expandBtn) {
+            expandBtn.addEventListener('click', () => {
+                createAndShowModal(imageUrls, getActiveIndex());
+            });
+        }
+
+        updateSlider(getActiveIndex());
+        updateNavVisibility();
+    });
+}
+
+// バナー拡大モーダル（potenza002から移植）
+function createAndShowModal(imageUrls, startIndex) {
+    const existingModal = document.querySelector('.banner-modal');
+    if (existingModal) existingModal.remove();
+
+    const modalHtml = `
+        <div class="banner-modal active">
+            <button class="banner-modal-close">&times;</button>
+            <button class="banner-modal-nav banner-modal-prev">‹</button>
+            <div class="banner-modal-content">
+                <img class="banner-modal-image" src="${imageUrls[startIndex]}" alt="拡大画像">
+                <div class="banner-modal-counter">${startIndex + 1}/${imageUrls.length}</div>
+            </div>
+            <button class="banner-modal-nav banner-modal-next">›</button>
+            <div class="banner-modal-dots">
+                ${imageUrls.map((_, idx) => `
+                    <button class="banner-modal-dot ${idx === startIndex ? 'active' : ''}" data-index="${idx}" aria-label="${idx + 1}"></button>
+                `).join('')}
+            </div>
+        </div>`;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = document.querySelector('.banner-modal');
+    const modalImage = modal.querySelector('.banner-modal-image');
+    const modalCounter = modal.querySelector('.banner-modal-counter');
+    const closeBtn = modal.querySelector('.banner-modal-close');
+    const prevBtn = modal.querySelector('.banner-modal-prev');
+    const nextBtn = modal.querySelector('.banner-modal-next');
+    const modalDots = modal.querySelectorAll('.banner-modal-dot');
+    const modalDotsWrap = modal.querySelector('.banner-modal-dots');
+
+    let currentModalIndex = startIndex;
+    function updateModalSlide(index) {
+        modalImage.src = imageUrls[index];
+        modalCounter.textContent = `${index + 1}/${imageUrls.length}`;
+        currentModalIndex = index;
+        if (modalDots && modalDots.length) {
+            modalDots.forEach((d, i) => {
+                if (i === index) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+        }
+    }
+
+    closeBtn.addEventListener('click', () => { modal.remove(); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    prevBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+        updateModalSlide(newIndex);
+    });
+    nextBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+        updateModalSlide(newIndex);
+    });
+    if (modalDots && modalDots.length) {
+        modalDots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.getAttribute('data-index'), 10) || 0;
+                updateModalSlide(idx);
+            });
+        });
+    }
+    if (imageUrls.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (modalDotsWrap) modalDotsWrap.style.display = 'none';
+    }
+
+    const handleKey = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleKey);
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+    };
+    document.addEventListener('keydown', handleKey);
+}

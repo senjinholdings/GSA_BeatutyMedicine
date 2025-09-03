@@ -2772,6 +2772,124 @@ section.clinic-rankings .ranking-header-banner {
     margin: 0 auto;
 }
 
+/* ===== バナースライダー（potenza002より移植） ===== */
+.banner-slider {
+    position: relative;
+    overflow: hidden;
+    background: #f8f8f8;
+    border-radius: 8px;
+}
+
+.banner-slider .slider-container { position: relative; }
+
+.banner-slider .slider-counter {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 10;
+}
+
+.banner-slider .slider-wrapper { overflow: hidden; position: relative; }
+.banner-slider .slider-track { position: relative; width: 100%; height: 100%; }
+
+.banner-slider .slider-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.banner-slider .slider-slide.active { position: relative; opacity: 1; }
+.banner-slider .slider-slide img { width: 100%; height: auto; display: block; cursor: zoom-in; }
+
+.banner-slider .slider-nav {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none; border-radius: 50%;
+    width: 30px; height: 30px; font-size: 20px;
+    cursor: pointer; z-index: 10;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.3s;
+}
+.banner-slider .slider-nav:hover { background: rgba(255, 255, 255, 0.95); }
+.banner-slider .slider-prev { left: 10px; }
+.banner-slider .slider-next { right: 10px; }
+
+.banner-slider .slider-expand {
+    position: absolute;
+    bottom: 10px; right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white; border: none; padding: 6px 12px;
+    border-radius: 4px; font-size: 12px; cursor: pointer;
+    z-index: 10; transition: background 0.3s;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.banner-slider .slider-expand:hover { background: rgba(0,0,0,0.8); }
+.banner-slider .slider-expand i { font-size: 14px; line-height: 1; color: #fff; }
+
+.banner-slider .slider-dots {
+    display: flex; justify-content: center; gap: 6px;
+    padding: 10px; background: white;
+}
+.banner-slider .slider-dot {
+    width: 8px; height: 8px; border-radius: 50%; border: none;
+    background: #ccc; cursor: pointer; transition: background 0.3s;
+}
+.banner-slider .slider-dot.active { background: #2CC7C5; }
+.banner-slider .slider-dot:hover { background: #999; }
+
+/* ===== バナー拡大モーダル ===== */
+.banner-modal {
+    display: none; position: fixed; z-index: 10000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    overflow: auto; background-color: rgba(0,0,0,0.9);
+}
+.banner-modal.active { display: flex; justify-content: center; align-items: center; }
+.banner-modal-content { position: relative; max-width: 90%; max-height: 90%; }
+.banner-modal-image { width: 100%; height: auto; display: block; }
+
+.banner-modal-close {
+    position: absolute; top: 15px; right: 35px;
+    color: #f1f1f1; font-size: 40px; font-weight: bold;
+    cursor: pointer; background: none; border: none; z-index: 10001;
+}
+.banner-modal-close:hover, .banner-modal-close:focus { color: #fff; text-decoration: none; }
+
+.banner-modal-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: none; color: #000; border: none; border-radius: 0;
+    width: 40px; height: 40px; font-size: 32px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;
+    z-index: 10002; text-shadow:
+        -1px -1px 0 #fff, 0 -1px 0 #fff, 1px -1px 0 #fff,
+        -1px 0 0 #fff, 1px 0 0 #fff, -1px 1px 0 #fff,
+        0 1px 0 #fff, 1px 1px 0 #fff;
+}
+.banner-modal-nav:hover { opacity: 0.9; }
+.banner-modal-prev { left: 20px; }
+.banner-modal-next { right: 20px; }
+.banner-modal-counter {
+    position: absolute; top: 15px; left: 15px; color: #fff;
+    background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 4px;
+    font-size: 12px; z-index: 10002;
+}
+.banner-modal-dots {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; align-items: center; justify-content: center; z-index: 10002;
+}
+.banner-modal-dot {
+    width: 10px; height: 10px; border-radius: 50%; border: none;
+    background: #bbb; cursor: pointer; transition: background 0.2s;
+}
+.banner-modal-dot.active { background: #2CC7C5; }
+.banner-modal-dot:hover { background: #888; }
+
 /* detail-rank-best要素のレスポンシブスタイル */
 #detail-rank-best {
     position: absolute;

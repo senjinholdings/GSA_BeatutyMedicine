@@ -2228,10 +2228,9 @@ class RankingApp {
             this.displayManager.updateFooterClinics(allClinics, ranking);
 
             // 店舗リストの取得と表示（クリニックごとにグループ化）
-            // 店舗一覧表示は無効化（不要なUIのため）
-            // const stores = this.dataManager.getStoresByRegionId(normalizedRegionId);
-            // const clinicsWithStores = this.groupStoresByClinics(stores, ranking, allClinics);
-            // this.displayManager.updateStoresDisplay(stores, clinicsWithStores);
+            const stores = this.dataManager.getStoresByRegionId(normalizedRegionId);
+            const clinicsWithStores = this.groupStoresByClinics(stores, ranking, allClinics);
+            this.displayManager.updateStoresDisplay(stores, clinicsWithStores);
 
             // 比較表ヘッダーの更新
             this.updateComparisonHeaders();
@@ -2244,6 +2243,12 @@ class RankingApp {
             
             // 詳細コンテンツの更新 (正規化されたIDを使用)
             this.updateClinicDetails(allClinics, ranking, normalizedRegionId);
+
+            // ランキング詳細DOM挿入後にバナースライダーを確実に初期化
+            // （initializeBannerSlidersは多重初期化ガード付き）
+            setTimeout(() => {
+                try { initializeBannerSliders(); } catch (_) {}
+            }, 0);
             
             // 比較表の注釈を更新（1位〜5位）
             setTimeout(() => {
@@ -3531,12 +3536,56 @@ class RankingApp {
                     // DataManagerからバナーパスを動的に取得
                     const clinicCode = this.dataManager.getClinicCodeById(clinicId);
                     const bannerFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
-                    const correctBanner = data.banner || `../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr.webp`;
-                    return correctBanner ? `
-                    <div class="detail-banner">
-                        <img src="${correctBanner}" alt="${clinic.name}キャンペーン">
+                    
+                    // 汎用: 複数バナー候補を命名規則から生成（存在しない画像は初期化時に除外）
+                    const base = `../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr.webp`;
+                    // ベース（*_detail_bnr.webp）は全クリニックで表示しない
+                    const candidates = [];
+                    // CSVで指定があれば最優先で追加（ベース指定も許可）
+                    const csvBannerRaw = this.dataManager.getClinicText(clinicCode, '詳細バナー画像パス', '');
+                    if (csvBannerRaw) {
+                        candidates.push(csvBannerRaw);
+                    }
+                    // TCBのポテンツァ専用バナーも候補に追加（CSVよりは後ろ）
+                    if (clinicCode === 'tcb') {
+                        candidates.push(`../common_data/images/clinics/tcb/tcb_detail_bnr_potenza.webp`);
+                    }
+                    for (let i = 2; i <= 10; i++) {
+                        candidates.push(`../common_data/images/clinics/${bannerFolder}/${bannerFolder}_detail_bnr${i}.webp`);
+                    }
+                    const bannerImages = Array.from(new Set(candidates));
+
+                    return `
+                    <div class="detail-banner banner-slider" data-clinic-id="${clinicId}">
+                        <div class="slider-container">
+                            <div class="slider-counter">1/${bannerImages.length}</div>
+                            <button class="slider-nav slider-prev" data-clinic-id="${clinicId}">
+                                <span>‹</span>
+                            </button>
+                            <div class="slider-wrapper">
+                                <div class="slider-track" data-clinic-id="${clinicId}">
+                                    ${bannerImages.map((img, index) => `
+                                        <div class=\"slider-slide ${index === 0 ? 'active' : ''}\" data-index=\"${index}\">
+                                            <img src=\"${img}\" alt=\"${clinic.name}キャンペーン${index + 1}\">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <button class="slider-nav slider-next" data-clinic-id="${clinicId}">
+                                <span>›</span>
+                            </button>
+                            <button class="slider-expand" data-clinic-id="${clinicId}">
+                                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                                <span>画像を拡大</span>
+                            </button>
+                        </div>
+                        <div class="slider-dots">
+                            ${bannerImages.map((_, index) => `
+                                <button class="slider-dot ${index === 0 ? 'active' : ''}" data-index="${index}" data-clinic-id="${clinicId}"></button>
+                            `).join('')}
+                        </div>
                     </div>
-                    ` : '';
+                    `;
                 })()}
                 <div class="detail-features">
                     ${data.features.map(feature => `<span class="feature-tag">${this.dataManager.processDecoTags(feature.startsWith('#') ? feature : '# ' + feature)}</span>`).join('')}
@@ -4473,6 +4522,269 @@ function initializeDisclaimers() {
     }
 }
 
+// バナースライダーの初期化関数
+function initializeBannerSliders() {
+    const sliders = document.querySelectorAll('.banner-slider');
+    
+    sliders.forEach(slider => {
+        // すでに初期化済みのスライダーはスキップ（多重バインド防止）
+        if (slider.dataset.initialized === '1') return;
+        slider.dataset.initialized = '1';
+        const clinicId = slider.dataset.clinicId;
+        let slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+        let dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+        const dotsContainer = slider.querySelector('.slider-dots');
+        const prevBtn = slider.querySelector('.slider-prev');
+        const nextBtn = slider.querySelector('.slider-next');
+        const counter = slider.querySelector('.slider-counter');
+        const expandBtn = slider.querySelector('.slider-expand');
+        
+        // スライドが存在しなければ何もしない
+        if (!slidesArr || slidesArr.length === 0) return;
+
+        let currentIndex = 0;
+        let totalSlides = slidesArr.length;
+        
+        // 画像のURLを取得
+        const getImageUrls = () => Array.from(slider.querySelectorAll('.slider-slide')).map(slide => {
+            const img = slide.querySelector('img');
+            return img ? img.src : '';
+        });
+        let imageUrls = getImageUrls();
+
+        // 現在のアクティブインデックスを取得
+        const getActiveIndex = () => {
+            const idx = slidesArr.findIndex(s => s.classList.contains('active'));
+            return idx >= 0 ? idx : 0;
+        };
+        currentIndex = getActiveIndex();
+        
+        // 画像やスライド自体のクリックでも拡大モーダルを開く
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            const open = () => createAndShowModal(imageUrls, getActiveIndex());
+            if (img) {
+                img.style.cursor = 'zoom-in';
+                img.addEventListener('click', open);
+            } else {
+                slide.addEventListener('click', open);
+            }
+        });
+
+        // スライドを更新する関数
+        function updateSlider(index) {
+            // すべてのスライドとドットを非アクティブに
+            slidesArr.forEach(slide => slide.classList.remove('active'));
+            dotsArr.forEach(dot => dot.classList.remove('active'));
+            
+            // 現在のスライドとドットをアクティブに
+            slidesArr[index]?.classList.add('active');
+            if (dotsArr[index]) dotsArr[index].classList.add('active');
+            
+            // カウンターを更新
+            if (counter) {
+                counter.textContent = `${index + 1}/${totalSlides}`;
+            }
+            
+            currentIndex = index;
+        }
+
+        // ナビゲーションの表示/非表示を更新
+        function updateNavVisibility() {
+            const show = totalSlides > 1;
+            if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+            if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+            if (dotsContainer) dotsContainer.style.display = show ? '' : 'none';
+        }
+
+        // スライド・ドットの再インデックス化
+        function reindex() {
+            slidesArr = Array.from(slider.querySelectorAll('.slider-slide'));
+            dotsArr = Array.from(slider.querySelectorAll('.slider-dot'));
+            slidesArr.forEach((s, i) => s.setAttribute('data-index', String(i)));
+            dotsArr.forEach((d, i) => d.setAttribute('data-index', String(i)));
+            totalSlides = slidesArr.length;
+            imageUrls = getImageUrls();
+            updateNavVisibility();
+        }
+
+        // 読み込み失敗スライドの除去
+        function removeSlideAt(idx) {
+            const slide = slidesArr[idx];
+            const dot = dotsArr[idx];
+            if (slide) slide.remove();
+            if (dot) dot.remove();
+            reindex();
+            if (totalSlides === 0) return; // 全滅時
+            if (currentIndex >= totalSlides) currentIndex = totalSlides - 1;
+            updateSlider(currentIndex);
+        }
+
+        slidesArr.forEach((slide) => {
+            const img = slide.querySelector('img');
+            if (!img) return;
+            img.addEventListener('error', () => {
+                // 現在のインデックスを data-index から取得
+                const idxAttr = slide.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : slidesArr.indexOf(slide);
+                if (idx >= 0) removeSlideAt(idx);
+            }, { once: true });
+        });
+        
+        // 前へボタン
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === 0 ? totalSlides - 1 : currentIndex - 1;
+                updateSlider(newIndex);
+            });
+        }
+        
+        // 次へボタン
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const newIndex = currentIndex === totalSlides - 1 ? 0 : currentIndex + 1;
+                updateSlider(newIndex);
+            });
+        }
+        
+        // ドットクリック
+        dotsArr.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idxAttr = dot.getAttribute('data-index');
+                const idx = idxAttr ? parseInt(idxAttr, 10) : dotsArr.indexOf(dot);
+                updateSlider(Math.max(0, idx));
+            });
+        });
+        
+        // 画像拡大ボタン - モーダル表示
+        if (expandBtn) {
+            expandBtn.addEventListener('click', () => {
+                createAndShowModal(imageUrls, getActiveIndex());
+            });
+        }
+
+        // 初期表示を同期（activeが付いていない場合は0に）
+        updateSlider(getActiveIndex());
+        updateNavVisibility();
+    });
+}
+
+// モーダル作成と表示
+function createAndShowModal(imageUrls, startIndex) {
+    // 既存のモーダルがあれば削除
+    const existingModal = document.querySelector('.banner-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // モーダルHTML作成
+    const modalHtml = `
+        <div class="banner-modal active">
+            <button class="banner-modal-close">&times;</button>
+            <button class="banner-modal-nav banner-modal-prev">‹</button>
+            <div class="banner-modal-content">
+                <img class="banner-modal-image" src="${imageUrls[startIndex]}" alt="拡大画像">
+                <div class="banner-modal-counter">${startIndex + 1}/${imageUrls.length}</div>
+            </div>
+            <button class="banner-modal-nav banner-modal-next">›</button>
+            <div class="banner-modal-dots">
+                ${imageUrls.map((_, idx) => `
+                    <button class="banner-modal-dot ${idx === startIndex ? 'active' : ''}" data-index="${idx}" aria-label="${idx + 1}"></button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // モーダルをbodyに追加
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    const modal = document.querySelector('.banner-modal');
+    const modalImage = modal.querySelector('.banner-modal-image');
+    const modalCounter = modal.querySelector('.banner-modal-counter');
+    const closeBtn = modal.querySelector('.banner-modal-close');
+    const prevBtn = modal.querySelector('.banner-modal-prev');
+    const nextBtn = modal.querySelector('.banner-modal-next');
+    const modalDots = modal.querySelectorAll('.banner-modal-dot');
+    const modalDotsWrap = modal.querySelector('.banner-modal-dots');
+    
+    let currentModalIndex = startIndex;
+    
+    // モーダル内のスライド更新
+    function updateModalSlide(index) {
+        modalImage.src = imageUrls[index];
+        modalCounter.textContent = `${index + 1}/${imageUrls.length}`;
+        currentModalIndex = index;
+        // ドットのアクティブ状態を更新
+        if (modalDots && modalDots.length) {
+            modalDots.forEach((d, i) => {
+                if (i === index) d.classList.add('active');
+                else d.classList.remove('active');
+            });
+        }
+    }
+    
+    // 閉じるボタン
+    closeBtn.addEventListener('click', () => {
+        modal.remove();
+    });
+    
+    // モーダル背景クリックで閉じる
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+    
+    // 前へボタン
+    prevBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+        updateModalSlide(newIndex);
+    });
+    
+    // 次へボタン
+    nextBtn.addEventListener('click', () => {
+        const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+        updateModalSlide(newIndex);
+    });
+    
+    // ドットクリック
+    if (modalDots && modalDots.length) {
+        modalDots.forEach((dot) => {
+            dot.addEventListener('click', () => {
+                const idx = parseInt(dot.getAttribute('data-index'), 10) || 0;
+                updateModalSlide(idx);
+            });
+        });
+    }
+    
+    // 1枚しかない場合は矢印とドットを非表示
+    if (imageUrls.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (modalDotsWrap) modalDotsWrap.style.display = 'none';
+    }
+    
+    // キーボード操作（ESCで閉じる／左右矢印で移動）
+    const handleKey = (e) => {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', handleKey);
+            return;
+        }
+        if (e.key === 'ArrowLeft') {
+            const newIndex = currentModalIndex === 0 ? imageUrls.length - 1 : currentModalIndex - 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+        if (e.key === 'ArrowRight') {
+            const newIndex = currentModalIndex === imageUrls.length - 1 ? 0 : currentModalIndex + 1;
+            updateModalSlide(newIndex);
+            return;
+        }
+    };
+    document.addEventListener('keydown', handleKey);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     
     const app = new RankingApp();
@@ -4484,6 +4796,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         initializeDisclaimers();
     }, 100);
+    
+    // バナースライダーの初期化
+    setTimeout(() => {
+        initializeBannerSliders();
+    }, 200);
     
     // デバッグ用：グローバル関数として公開
     window.testInitializeDisclaimers = initializeDisclaimers;
@@ -4524,4 +4841,123 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // ランキング読込後にフッター追従ポップをセットアップ
+    setTimeout(() => {
+        try { setupFooterFollowPopup(); } catch(_) {}
+    }, 700);
 });
+
+// フッター追従ポップ生成・制御
+function setupFooterFollowPopup() {
+    const dm = window.app?.dataManager || window.dataManager;
+    const urlHandler = window.app?.urlHandler || new UrlParamHandler();
+    if (!dm) return;
+
+    // コンテナ生成
+    let popup = document.querySelector('.footer-follow-popup');
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.className = 'footer-follow-popup';
+        popup.innerHTML = `
+            <button class="popup-close" aria-label="閉じる">×</button>
+            <div class="popup-inner">
+                <div class="popup-left">
+                    <img class="popup-logo" alt="おすすめクリニック" />
+                }
+                <div class="popup-right">
+                    <a href="#" class="fixed-mail-hankyo-button popup-link" target="_blank" rel="noopener">
+                        <div class="fixed-mail-hankyo-button__tag">無料</div>
+                        <div class="fixed-mail-hankyo-button__inner">
+                            <div class="fixed-mail-hankyo-button__inner__text">
+                                <div class="fixed-mail-hankyo-button__inner__text__sub">カウンセリングを</div>
+                                <div class="fixed-mail-hankyo-button__inner__text__main">予約する</div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(popup);
+    }
+
+    const imgEl = popup.querySelector('.popup-logo');
+    const linkEl = popup.querySelector('.popup-link');
+    const closeBtn = popup.querySelector('.popup-close');
+
+    // ランキングから1位クリニックを取得
+    const regionIdRaw = window.app?.currentRegionId || new UrlParamHandler().getRegionId() || '13';
+    const regionId = String(parseInt(regionIdRaw, 10));
+    const ranking = dm.getRankingByRegionId(regionId);
+    const firstId = ranking?.ranks?.no1;
+    if (!firstId) {
+        // データ未準備時はリトライ
+        setTimeout(setupFooterFollowPopup, 500);
+        return;
+    }
+
+    const clinicCode = dm.getClinicCodeById(firstId);
+    const clinic = (dm.clinics || []).find(c => c.id == firstId);
+    const logoFolder = clinicCode === 'kireiline' ? 'kireiline' : clinicCode;
+
+    // ロゴ候補をCSV最優先で構築
+    const candidates = [];
+    const csvLogo = dm.getClinicText(clinicCode, 'ロゴ画像パス', '');
+    if (csvLogo) candidates.push(csvLogo);
+    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.webp`);
+    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.jpg`);
+    candidates.push(`../common_data/images/clinics/${logoFolder}/${logoFolder}-logo.png`);
+
+    // 画像フォールバック（順に試す）
+    function setNextSrc(list, idx) {
+        if (!imgEl) return;
+        if (idx >= list.length) {
+            // 画像がなければ画像だけ非表示
+            imgEl.style.display = 'none';
+            return;
+        }
+        imgEl.src = list[idx];
+        imgEl.alt = clinic?.name || 'おすすめクリニック';
+        imgEl.onerror = () => setNextSrc(list, idx+1);
+    }
+    setNextSrc(Array.from(new Set(candidates)), 0);
+
+    // 公式リンク
+    if (linkEl) {
+        linkEl.href = urlHandler.getClinicUrlWithRegionId(firstId, 1);
+    }
+
+    // 閉じる（セッション内で再表示しない）
+    closeBtn?.addEventListener('click', () => {
+        popup.classList.remove('visible');
+        sessionStorage.setItem('footerPopupClosed', '1');
+    });
+
+    // スクロールで表示制御（10%で表示）
+    let ticking = false;
+    function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            ticking = false;
+            if (sessionStorage.getItem('footerPopupClosed') === '1') {
+                popup.classList.remove('visible');
+                return;
+            }
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+            const docHeight = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight
+            ) - window.innerHeight;
+            const depth = docHeight > 0 ? scrollTop / docHeight : 0;
+            if (depth >= 0.10) popup.classList.add('visible');
+            else popup.classList.remove('visible');
+        });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // 初回評価
+    onScroll();
+
+    // 初期化完了フラグ
+    window._footerPopupInitialized = true;
+}
