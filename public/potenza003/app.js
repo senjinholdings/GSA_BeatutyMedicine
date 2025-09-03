@@ -859,6 +859,80 @@ class DataManager {
         }
     }
 
+    // 口コミタブのラベルをCSV（項目名）から抽出（クリニック別に順序付きで取得）
+    // 返却: ラベル配列（例: ['特典','スタッフ','サービス']）。n=1→3の順。重複は最初のみ。
+    // 括弧は全角/半角の両方に対応。
+    getReviewTabLabels(clinicCode) {
+        try {
+            // 指定クリニックのデータを取得
+            const codeToNameMap = {
+                'tcb': 'TCB',
+                'TCB': 'TCB',
+                'luna': 'LUNAビューティークリニック',
+                'LUNAビューティークリニック': 'LUNAビューティークリニック',
+                'rize': 'リゼクリニック',
+                'リゼクリニック': 'リゼクリニック',
+                'shinagawa': '品川美容外科',
+                '品川美容外科': '品川美容外科',
+                'seishin': '聖心美容クリニック',
+                '聖心美容クリニック': '聖心美容クリニック'
+            };
+            let clinicName = codeToNameMap[clinicCode];
+            if (!clinicName) {
+                const clinic = this.clinics.find(c => c.code === clinicCode);
+                clinicName = clinic ? clinic.name : null;
+            }
+            // fallback: 先頭のクリニック
+            const specialKeys = new Set(['比較表ヘッダー設定', '詳細フィールドマッピング']);
+            if (!clinicName) {
+                const clinicKeys = Object.keys(this.clinicTexts || {}).filter(k => !specialKeys.has(k));
+                clinicName = clinicKeys[0];
+            }
+            const clinicData = (this.clinicTexts && clinicName) ? (this.clinicTexts[clinicName] || {}) : {};
+
+            // 全キーを上から走査し、カテゴリ（括弧内）を初出順に収集
+            // かつ、各カテゴリの最小n（口コミnタイトル）を保持し、n昇順→初出順でソート
+            const keys = Object.keys(clinicData);
+            const meta = new Map(); // label -> { firstIndex, minN }
+            for (let idx = 0; idx < keys.length; idx++) {
+                const k = keys[idx];
+                let m = k.match(/^口コミ([1-3])タイトル（(.+?)）$/);
+                if (!m) m = k.match(/^口コミ([1-3])タイトル\((.+?)\)$/);
+                if (!m) continue;
+                const n = parseInt(m[1], 10);
+                const label = m[2];
+                if (!meta.has(label)) {
+                    meta.set(label, { firstIndex: idx, minN: n });
+                } else {
+                    const obj = meta.get(label);
+                    if (n < obj.minN) obj.minN = n;
+                }
+            }
+            let labels = Array.from(meta.entries())
+                .sort((a, b) => (a[1].minN - b[1].minN) || (a[1].firstIndex - b[1].firstIndex))
+                .map(([label]) => label);
+            if (labels.length === 0) labels = ['コスパ', 'スタッフ', 'サービス'];
+            // 最大3つまでに制限（UI都合）
+            return labels.slice(0, 3);
+        } catch (_) {
+            return ['コスパ', 'スタッフ', 'サービス'];
+        }
+    }
+
+    // 指定ラベル（括弧内）に対応する口コミ配列を取得（タイトル/内容×1..3）
+    getClinicReviewsByLabel(clinicCode, label) {
+        const reviews = [];
+        for (let i = 1; i <= 3; i++) {
+            // 全角/半角括弧の両方を試す
+            let title = this.getClinicText(clinicCode, `口コミ${i}タイトル（${label}）`, '');
+            if (!title) title = this.getClinicText(clinicCode, `口コミ${i}タイトル(${label})`, '');
+            let content = this.getClinicText(clinicCode, `口コミ${i}内容（${label}）`, '');
+            if (!content) content = this.getClinicText(clinicCode, `口コミ${i}内容(${label})`, '');
+            if (title || content) reviews.push({ title, content });
+        }
+        return reviews;
+    }
+
     // ダブルクオートを考慮したCSVパーサ
     parseCsvWithQuotes(csvText) {
         const lines = csvText.split(/\r?\n/);
@@ -3668,15 +3742,23 @@ class RankingApp {
                     <section id="review_tab_box">
                         <nav role="navigation" class="review_tab2">
                             <ul>
-                                <li class="select2" data-tab="cost"><i class="fas fa-yen-sign"></i> コスパ</li>
-                                <li data-tab="access"><i class="fas fa-user-md"></i> スタッフ</li>
-                                <li data-tab="staff"><i class="fas fa-heart"></i> サービス</li>
+                                ${(() => {
+                                    const clinicCodeForLabels = this.dataManager.getClinicCodeById(clinicId);
+                                    const labels = this.dataManager.getReviewTabLabels(clinicCodeForLabels) || [];
+                                    const icons = ['fa-yen-sign', 'fa-user-md', 'fa-heart'];
+                                    if (labels.length === 0) return '';
+                                    return labels.map((label, idx) => {
+                                        const icon = icons[idx] || 'fa-comment-dots';
+                                        const active = idx === 0 ? 'select2' : '';
+                                        return `<li class="${active}" data-tab="tab-${idx}"><i class="fas ${icon}"></i> ${label}</li>`;
+                                    }).join('');
+                                })()}
                             </ul>
                         </nav>
                         ${(() => {
-                            // 口コミデータを動的に取得
+                            // 口コミデータを動的に取得（タブラベルと中身をCSVの括弧内で対応させる）
                             const clinicCode = this.dataManager.getClinicCodeById(clinicId);
-                            const reviews = this.dataManager.getClinicReviews(clinicCode);
+                            const labelList = this.dataManager.getReviewTabLabels(clinicCode) || [];
                             const reviewIcons = [
                                 '../common_data/images/review_icon/review_icon1.webp',
                                 '../common_data/images/review_icon/review_icon2.webp',
@@ -3690,72 +3772,36 @@ class RankingApp {
                             ];
                             
                             let html = '';
+                            const dm = this.dataManager;
                             
-                            // コスパタブの口コミ
-                            html += '<div class="wrap_long2 active">';
-                            reviews.cost.forEach((review, index) => {
-                                const iconIndex = (rank + index) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
+                            // 3カテゴリを順番に描画（カテゴリと中身を対応）
+                            labelList.forEach((label, catIdx) => {
+                                const activeClass = catIdx === 0 ? 'active' : 'disnon2';
+                                html += `<div class="wrap_long2 ${activeClass}">`;
+                                const reviews = dm.getClinicReviewsByLabel(clinicCode, label);
+                                reviews.forEach((review, index) => {
+                                    const iconIndex = (rank + index + (catIdx*3)) % reviewIcons.length;
+                                    html += `
+                                        <div class="review_tab_box_in">
+                                            <div class="review_tab_box_img">
+                                                <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
+                                                <span>★★★★★</span>
+                                            </div>
+                                            <div class="review_tab_box_r">
+                                                <div class="review_tab_box_title"><strong>${review.title}</strong></div>
+                                                <div class="review_tab_box_txt">
+                                                    ${review.content}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                `;
+                                    `;
+                                });
+                                if (reviews.length === 0) {
+                                    html += '<div class="review_tab_box_in"><div class="review_tab_box_r"><div class="review_tab_box_txt">準備中</div></div></div>';
+                                }
+                                html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
+                                html += '</div>';
                             });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
-                            
-                            // 通いやすさタブの口コミ
-                            html += '<div class="wrap_long2 disnon2">';
-                            reviews.access.forEach((review, index) => {
-                                const iconIndex = (rank + index + 3) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
-                            
-                            // スタッフタブの口コミ
-                            html += '<div class="wrap_long2 disnon2">';
-                            reviews.staff.forEach((review, index) => {
-                                const iconIndex = (rank + index + 6) % reviewIcons.length;
-                                html += `
-                                    <div class="review_tab_box_in">
-                                        <div class="review_tab_box_img">
-                                            <img src="${reviewIcons[iconIndex]}" alt="レビューアイコン">
-                                            <span>★★★★★</span>
-                                        </div>
-                                        <div class="review_tab_box_r">
-                                            <div class="review_tab_box_title"><strong>${review.title}</strong></div>
-                                            <div class="review_tab_box_txt">
-                                                ${review.content}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            html += '<p style="font-size:8px;text-align:right">※効果には個人差があります<br>※個人の感想です</p>';
-                            html += '</div>';
                             
                             return html;
                         })()}

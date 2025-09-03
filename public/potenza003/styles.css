@@ -1222,8 +1222,8 @@ select {
     }
 
     .info_logo {
-        width: clamp(40px, 25vw, 150px);
-        height: clamp(40px, 25vw, 150px);
+        width: clamp(40px, 20vw, 150px);
+        height: clamp(40px, 20vw, 150px);
         padding: 6px;
     }
 
