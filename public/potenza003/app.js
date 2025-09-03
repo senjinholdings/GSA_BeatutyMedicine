@@ -4953,6 +4953,8 @@ function closeClinicDetailModal() {
 
 // スクロール追従モーダル
 function initializeScrollModal() {
+    console.log('Initializing scroll modal...');
+    
     // 既存のモーダルがあれば削除
     const existingModal = document.querySelector('.scroll-bottom-modal');
     if (existingModal) existingModal.remove();
@@ -4963,7 +4965,10 @@ function initializeScrollModal() {
     
     // DataManagerから1位のクリニック情報を取得
     if (window.dataManager) {
+        // data-rank="1"の要素を探す
         const firstClinic = document.querySelector('[data-rank="1"]');
+        console.log('First clinic element:', firstClinic);
+        
         if (firstClinic) {
             const clinicId = firstClinic.getAttribute('data-clinic-id');
             const clinicCode = window.dataManager.getClinicCodeById(clinicId);
@@ -4979,7 +4984,13 @@ function initializeScrollModal() {
 
     // デフォルトロゴ（取得できなかった場合）
     if (!clinicLogoUrl) {
-        clinicLogoUrl = './images/logo-placeholder.png';
+        // ランキング1位の画像から取得を試みる
+        const firstRankingLogo = document.querySelector('#clinic1 .ranking__logo img');
+        if (firstRankingLogo && firstRankingLogo.src) {
+            clinicLogoUrl = firstRankingLogo.src;
+        } else {
+            clinicLogoUrl = './images/logo-placeholder.png';
+        }
     }
 
     // モーダルのHTML作成
@@ -5001,12 +5012,18 @@ function initializeScrollModal() {
     const modal = document.querySelector('.scroll-bottom-modal');
     const closeBtn = modal.querySelector('.scroll-modal-close');
     
+    if (!modal || !closeBtn) {
+        console.error('Modal elements not found');
+        return;
+    }
+    
     let hasShown = false;
     let isClosed = false;
 
     // モーダルを表示する関数
     function showModal() {
         if (!hasShown && !isClosed) {
+            console.log('Showing modal');
             modal.classList.add('show');
             hasShown = true;
         }
@@ -5014,6 +5031,7 @@ function initializeScrollModal() {
 
     // モーダルを非表示にする関数
     function hideModal() {
+        console.log('Hiding modal');
         modal.classList.remove('show');
         isClosed = true;
     }
@@ -5030,6 +5048,8 @@ function initializeScrollModal() {
         const documentHeight = document.documentElement.scrollHeight;
         const scrollPercentage = (scrollTop / (documentHeight - windowHeight)) * 100;
         
+        console.log('Scroll percentage:', scrollPercentage);
+        
         // 10%以上スクロールしたら表示
         if (scrollPercentage >= 10) {
             showModal();
@@ -5040,7 +5060,9 @@ function initializeScrollModal() {
     window.addEventListener('scroll', checkScroll);
     
     // 初回チェック
-    checkScroll();
+    setTimeout(() => {
+        checkScroll();
+    }, 100);
 }
 
 // 症例スライダー（モーダル内）簡易初期化
@@ -5121,9 +5143,16 @@ function initializeCaseSliderIn(root) {
 }
 
 // DOMContentLoaded時にスクロールモーダルを初期化
-document.addEventListener('DOMContentLoaded', function() {
-    // 既存の初期化処理の後に追加
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        // 既存の初期化処理の後に追加
+        setTimeout(() => {
+            initializeScrollModal();
+        }, 2000); // 2秒後に初期化（データ読み込みを待つ）
+    });
+} else {
+    // すでにDOMが読み込まれている場合
     setTimeout(() => {
         initializeScrollModal();
-    }, 1000); // 1秒後に初期化
-});
+    }, 2000);
+}
