@@ -4207,6 +4207,12 @@ class RankingApp {
         const modalButton = document.getElementById('map-modal-button');
         
         if (modal && modalClinicName && modalAddress && modalAccess && modalMapContainer) {
+            // 変換コンテキストの影響を避けるため、body直下に移動（PCで左寄りになる問題の回避）
+            try {
+                if (modal.parentNode !== document.body) {
+                    document.body.appendChild(modal);
+                }
+            } catch (_) {}
             // まずモーダルを表示
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // スクロールを無効化
@@ -4281,9 +4287,11 @@ class RankingApp {
                     // ボタンテキストを設定
                     const buttonText = document.getElementById('map-modal-button-text');
                     if (buttonText) {
-                        // クリニック名を取得
-                        let clinicBaseName = clinicName || 'クリニック';
-                        buttonText.textContent = clinicBaseName + 'の公式サイト';
+                        // CTAは店舗名ではなくクリニック名のみを表示
+                        const ctaClinicName = (clinic && clinic.name)
+                            || (typeof clinicCode === 'string' && clinicCode)
+                            || 'クリニック';
+                        buttonText.textContent = ctaClinicName + 'の公式サイト';
                     }
                 } catch (error) {
                     // エラーが発生してもモーダルは表示されたままにする

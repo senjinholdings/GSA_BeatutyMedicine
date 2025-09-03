@@ -6364,30 +6364,32 @@ body.no-scroll { overflow: hidden; }
     z-index: 13000;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .map-modal-overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;           /* 画面全体を確実に覆う */
+    inset: 0;                  /* top/right/bottom/left を 0 に */
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
 }
 
 .map-modal-content {
     background-color: #fefefe;
-    position: relative;
+    position: fixed; /* ビューポート基準で中央配置 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1; /* オーバーレイより前面 */
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
+    width: min(90vw, 500px);
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -7111,30 +7113,32 @@ body.no-scroll { overflow: hidden; }
     z-index: 13000;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;  /* ビューポート幅に固定 */
+    height: 100vh; /* ビューポート高に固定 */
     display: none; /* デフォルトは非表示 */
     align-items: center;
     justify-content: center;
 }
 
 .map-modal-overlay {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
+    position: fixed;           /* 画面全体を確実に覆う（重複定義側も統一） */
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.5);
 }
 
 .map-modal-content {
     background-color: #fefefe;
-    position: relative;
+    position: fixed;           /* 画面中央に固定配置 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;                /* オーバーレイより前面 */
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 12px;
-    width: 90%;
-    max-width: 500px;
+    width: min(90vw, 500px);   /* 画面幅に追従しつつ上限設定 */
     max-height: 90vh;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
