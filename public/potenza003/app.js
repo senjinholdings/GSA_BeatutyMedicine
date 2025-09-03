@@ -3322,10 +3322,16 @@ class RankingApp {
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        const rank = parseInt(link.getAttribute('data-rank'));
-                        this.scrollToClinicDetail(rank);
+                        let rank = parseInt(link.getAttribute('data-rank'));
+                        if (!rank || Number.isNaN(rank)) {
+                            const href = link.getAttribute('href') || '';
+                            const m = href.match(/#clinic(\d+)/);
+                            if (m) rank = parseInt(m[1], 10);
+                        }
+                        if (rank && !Number.isNaN(rank)) {
+                            openClinicDetailModal(rank);
+                        }
                     });
-                } else {
                 }
             });
             
@@ -3333,11 +3339,17 @@ class RankingApp {
             const staticLinks = document.querySelectorAll('.detail-static-link');
             
             staticLinks.forEach((link, index) => {
-                
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const rank = parseInt(link.getAttribute('data-rank'));
-                    this.scrollToClinicDetail(rank);
+                    let rank = parseInt(link.getAttribute('data-rank'));
+                    if (!rank || Number.isNaN(rank)) {
+                        const href = link.getAttribute('href') || '';
+                        const m = href.match(/#clinic(\d+)/);
+                        if (m) rank = parseInt(m[1], 10);
+                    }
+                    if (rank && !Number.isNaN(rank)) {
+                        openClinicDetailModal(rank);
+                    }
                 });
             });
             
@@ -3354,55 +3366,10 @@ class RankingApp {
         }, 500); // setTimeoutの閉じ括弧を追加
     }
     
-    // クリニック詳細へスクロール
+    // クリニック詳細へ（互換）
     scrollToClinicDetail(rank) {
-        
-        // 直接IDで要素を取得（静的比較表と同じ形式）
-        const targetId = `clinic${rank}`;
-        
-        const targetElement = document.getElementById(targetId);
-        
-        // すべての詳細要素を確認
-        const allDetailElements = document.querySelectorAll('[id^="clinic"]');
-        allDetailElements.forEach(el => {
-            if (el.id.match(/^clinic\d+$/)) {
-                // Check element visibility
-            }
-        });
-        
-        // clinic-details-listセクションの存在確認
-        const detailsList = document.getElementById('clinic-details-list');
-        if (detailsList) {
-        }
-        
-        if (targetElement) {
-            // 要素の位置を取得してスクロール
-            const rect = targetElement.getBoundingClientRect();
-            
-            const elementTop = rect.top + window.pageYOffset;
-            const offset = 100; // ヘッダーの高さ分のオフセット
-            const scrollTo = elementTop - offset;
-            
-            window.scrollTo({
-                top: scrollTo,
-                behavior: 'smooth'
-            });
-            
-            // スクロール後の確認
-            setTimeout(() => {
-            }, 1000);
-        } else {
-            // 詳細要素が見つからない場合は、セクション全体にスクロール
-            const detailSection = document.getElementById('clinic-details-list');
-            if (detailSection) {
-                const sectionTop = detailSection.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({
-                    top: sectionTop - 100,
-                    behavior: 'smooth'
-                });
-            } else {
-            }
-        }
+        // 既存呼び出しの互換用: モーダル表示に置き換え
+        if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
     }
     
     // レビュータブ切り替え機能の設定
@@ -3674,7 +3641,7 @@ class RankingApp {
                         `;
                     }).join('');
 
-                    const dotsHtml = imagesForClinic.map((_, i) => `<button class=\"case-dot ${i===0?'active':''}\" data-index=\"${i}\" style=\"width:8px;height:8px;border-radius:50%;border:none;background:${i===0?'#2CC7C5':'#ccc'};margin:0 4px;cursor:pointer;\"></button>`).join('');
+                    const dotsHtml = imagesForClinic.map((_, i) => `<button type=\"button\" class=\"case-dot ${i===0?'active':''}\" data-index=\"${i}\" style=\"width:8px;height:8px;border-radius:50%;border:none;background:${i===0?'#2CC7C5':'#ccc'};margin:0 4px;cursor:pointer;\"></button>`).join('');
                     
                     return `
                     <div class=\"clinic-points-section\">
@@ -3944,7 +3911,20 @@ class RankingApp {
                     if (track && slides.length) {
                         prevBtn && prevBtn.addEventListener('click', () => show(current - 1));
                         nextBtn && nextBtn.addEventListener('click', () => show(current + 1));
-                        dots.forEach((d, idx) => d.addEventListener('click', () => show(idx)));
+                        dots.forEach((d, idx) => d.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); show(idx); }));
+                        if (dotsWrap) {
+                            dotsWrap.addEventListener('click', (e) => {
+                                const el = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+                                if (!el) return;
+                                const dot = el.closest && el.closest('.case-dot');
+                                if (!dot) return;
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const idxAttr = dot.getAttribute('data-index');
+                                const idx = idxAttr ? parseInt(idxAttr, 10) : Array.from(dotsWrap.querySelectorAll('.case-dot')).indexOf(dot);
+                                if (idx >= 0) show(idx);
+                            }, { capture: true });
+                        }
                         updateNavVisibility();
                         show(0);
                     }
@@ -4331,16 +4311,13 @@ class RankingApp {
 // 店舗の表示を切り替える関数（一度だけ開く）
 function toggleStores(button) {
     const targetId = button.getAttribute('data-target');
-    const targetShops = document.querySelector(targetId);
+    const root = button.closest('.clinic-detail-modal') || document;
+    const targetShops = root.querySelector(targetId) || document.querySelector(targetId);
+    if (!targetShops) return false;
     const hiddenShops = targetShops.querySelectorAll('.hidden-content');
-    
-    // 隠されている店舗を表示
-    hiddenShops.forEach(shop => {
-        shop.classList.remove('hidden');
-    });
-    
-    // ボタンを非表示にする（一度クリックしたら消える）
+    hiddenShops.forEach(shop => { shop.classList.remove('hidden'); });
     button.style.display = 'none';
+    return false;
 }
 
 // アプリケーションの初期化
@@ -4549,23 +4526,64 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // デバッグ用：グローバル関数として公開
     window.testInitializeDisclaimers = initializeDisclaimers;
+    // モーダル操作関数も明示的に公開（環境差分対策）
+    window.openClinicDetailModal = openClinicDetailModal;
+    window.closeClinicDetailModal = closeClinicDetailModal;
+
+    // 確認事項トグルのスコープ対応（モーダル優先で動作）
+    window.toggleClinicDisclaimer = function(uniqueSlug, event) {
+        if (event) { event.preventDefault?.(); event.stopPropagation?.(); }
+        const modalRoot = document.querySelector('.clinic-detail-modal');
+        const root = (event && event.target && event.target.closest('.clinic-detail-modal')) || modalRoot || document;
+        const content = root.querySelector(`#${uniqueSlug}-content`) || document.querySelector(`#${uniqueSlug}-content`);
+        const arrow = root.querySelector(`#${uniqueSlug}-arrow`) || document.querySelector(`#${uniqueSlug}-arrow`);
+        if (content) {
+            const isHidden = (getComputedStyle(content).display === 'none' || content.style.display === 'none');
+            content.style.display = isHidden ? 'block' : 'none';
+            if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        return false;
+    };
+    window.toggleDisclaimer = function(clinicSlug) {
+        const modalRoot = document.querySelector('.clinic-detail-modal');
+        const root = modalRoot || document;
+        const content = root.querySelector(`#${clinicSlug}-content`) || document.querySelector(`#${clinicSlug}-content`);
+        const arrow = root.querySelector(`#${clinicSlug}-arrow`) || document.querySelector(`#${clinicSlug}-arrow`);
+        if (content) {
+            const isHidden = (getComputedStyle(content).display === 'none' || content.style.display === 'none');
+            content.style.display = isHidden ? 'block' : 'none';
+            if (arrow) arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+        return false;
+    };
     
     // 初期化後にも一度詳細リンクをチェック
     setTimeout(() => {
         const allDetailLinks = document.querySelectorAll('a[href*="#clinic"]');
         
         // #clinicを含むリンクにイベントリスナーを追加
-        allDetailLinks.forEach((link, index) => {
+        allDetailLinks.forEach((link) => {
             link.addEventListener('click', (e) => {
-                // デフォルトの動作（アンカーリンクへのジャンプ）は維持
+                const href = link.getAttribute('href') || '';
+                const m = href.match(/#clinic(\d+)/);
+                if (m) {
+                    e.preventDefault();
+                    const rank = parseInt(m[1], 10);
+                    if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
+                }
             });
         });
         
-        // グローバルなクリックイベントリスナーも追加（デバッグ用）
+        // 追加のフォールバック: #clinicリンク全般をグローバルに捕捉（キャプチャ段階）
         document.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A' && (e.target.textContent.includes('詳細を見る') || e.target.textContent.includes('詳細をみる'))) {
-                // Track detail link click
-            }
+            const a = e.target.closest('a[href*="#clinic"]');
+            if (!a) return;
+            const href = a.getAttribute('href') || '';
+            const m = href.match(/#clinic(\d+)/);
+            if (!m) return;
+            e.preventDefault();
+            const rank = parseInt(m[1], 10);
+            if (rank && !Number.isNaN(rank)) openClinicDetailModal(rank);
         }, true);
     }, 500);
     
@@ -4794,4 +4812,133 @@ function createAndShowModal(imageUrls, startIndex) {
         }
     };
     document.addEventListener('keydown', handleKey);
+}
+
+// クリニック詳細モーダル（ボトムシート）
+function openClinicDetailModal(rank) {
+    closeClinicDetailModal();
+    const target = document.getElementById(`clinic${rank}`);
+    if (!target) return;
+    const contentRoot = target.querySelector('.ranking_box_in') || target;
+    const contentHtml = contentRoot.outerHTML;
+
+    const overlayHtml = '<div class="clinic-detail-overlay"></div>';
+    const modalHtml = `
+        <div class="clinic-detail-modal" role="dialog" aria-modal="true" aria-label="クリニック詳細">
+            <header>
+                <div style="font-size:14px;color:#333;">クリニック詳細</div>
+                <button class="clinic-detail-close" aria-label="閉じる">&times;</button>
+            </header>
+            <div class="clinic-detail-body">
+                ${contentHtml}
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', overlayHtml + modalHtml);
+    const overlay = document.querySelector('.clinic-detail-overlay');
+    const modal = document.querySelector('.clinic-detail-modal');
+    // バナースライダーの多重初期化ガード属性を除去して再初期化可能にする
+    if (modal) {
+        const modalSliders = modal.querySelectorAll('.banner-slider');
+        modalSliders.forEach((s) => {
+            s.removeAttribute('data-initialized');
+        });
+    }
+    requestAnimationFrame(() => {
+        overlay?.classList.add('active');
+        modal?.classList.add('active');
+        document.body.classList.add('no-scroll');
+        try { initializeBannerSliders(); } catch (_) {}
+        try { initializeCaseSliderIn(modal); } catch (_) {}
+    });
+
+    const cleanup = () => { closeClinicDetailModal(); };
+    overlay?.addEventListener('click', cleanup);
+    modal?.querySelector('.clinic-detail-close')?.addEventListener('click', cleanup);
+    const onKey = (e) => { if (e.key === 'Escape') cleanup(); };
+    document.addEventListener('keydown', onKey, { once: true });
+}
+
+function closeClinicDetailModal() {
+    const overlay = document.querySelector('.clinic-detail-overlay');
+    const modal = document.querySelector('.clinic-detail-modal');
+    if (overlay) overlay.parentNode.removeChild(overlay);
+    if (modal) modal.parentNode.removeChild(modal);
+    document.body.classList.remove('no-scroll');
+}
+
+// 症例スライダー（モーダル内）簡易初期化
+function initializeCaseSliderIn(root) {
+    if (!root) return;
+    const slider = root.querySelector('.case-slider');
+    if (!slider) return;
+    const track = slider.querySelector('.case-track');
+    if (!track) return;
+    let slides = Array.from(slider.querySelectorAll('.case-slide'));
+    const dotsWrap = root.querySelector('.case-dots');
+    let dots = Array.from(root.querySelectorAll('.case-dot'));
+    const prevBtn = slider.querySelector('.case-nav-prev');
+    const nextBtn = slider.querySelector('.case-nav-next');
+    if (!slides.length) return;
+    let current = 0;
+    const reindex = () => {
+        slides = Array.from(slider.querySelectorAll('.case-slide'));
+        dots = Array.from(root.querySelectorAll('.case-dot'));
+        dots.forEach((d, i) => d.setAttribute('data-index', String(i)));
+    };
+    const updateNavVisibility = () => {
+        const show = slides.length > 1;
+        if (prevBtn) prevBtn.style.display = show ? '' : 'none';
+        if (nextBtn) nextBtn.style.display = show ? '' : 'none';
+        if (dotsWrap) dotsWrap.style.display = show ? 'block' : 'none';
+    };
+    const show = (i) => {
+        if (!slides.length || !track) return;
+        if (i < 0) i = slides.length - 1;
+        if (i >= slides.length) i = 0;
+        current = i;
+        track.style.display = 'flex';
+        track.style.transform = `translateX(-${current * 100}%)`;
+        track.style.transition = 'transform .3s ease';
+        slides.forEach(s => { s.style.minWidth = '100%'; s.style.boxSizing = 'border-box'; });
+        dots.forEach((d, idx) => {
+            d.classList.toggle('active', idx === current);
+            d.style.background = (idx === current ? '#2CC7C5' : '#ccc');
+        });
+    };
+    const imgs = Array.from(slider.querySelectorAll('img'));
+    imgs.forEach((img) => {
+        img.addEventListener('error', () => {
+            const slide = img.closest('.case-slide');
+            if (!slide) return;
+            const idx = slides.indexOf(slide);
+            if (idx >= 0) {
+                const dot = dots[idx];
+                if (dot && dot.parentNode) dot.parentNode.removeChild(dot);
+                if (slide && slide.parentNode) slide.parentNode.removeChild(slide);
+                reindex();
+                if (!slides.length) return;
+                if (current >= slides.length) current = slides.length - 1;
+                updateNavVisibility();
+                show(current);
+            }
+        }, { once: true });
+    });
+    prevBtn && prevBtn.addEventListener('click', () => show(current - 1));
+    nextBtn && nextBtn.addEventListener('click', () => show(current + 1));
+    dots.forEach((d, idx) => d.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); show(idx); }));
+    if (dotsWrap) {
+        dotsWrap.addEventListener('click', (e) => {
+            const el = e.target && e.target.nodeType === 1 ? e.target : (e.target && e.target.parentElement);
+            if (!el) return;
+            const dot = el.closest && el.closest('.case-dot');
+            if (!dot) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const idxAttr = dot.getAttribute('data-index');
+            const idx = idxAttr ? parseInt(idxAttr, 10) : Array.from(dotsWrap.querySelectorAll('.case-dot')).indexOf(dot);
+            if (idx >= 0) show(idx);
+        }, { capture: true });
+    }
+    updateNavVisibility();
+    show(0);
 }
