@@ -4963,34 +4963,41 @@ function initializeScrollModal() {
     let clinicLogoUrl = '';
     let clinicUrl = '#ranking';
     
-    // DataManagerから1位のクリニック情報を取得
-    if (window.dataManager) {
-        // data-rank="1"の要素を探す
-        const firstClinic = document.querySelector('[data-rank="1"]');
-        console.log('First clinic element:', firstClinic);
+    // まずランキング1位のDOM要素から直接取得
+    const firstRankingItem = document.querySelector('#clinic1, .ranking_box[data-rank="1"]');
+    console.log('First ranking item:', firstRankingItem);
+    
+    if (firstRankingItem) {
+        // ロゴ画像を取得
+        const logoImg = firstRankingItem.querySelector('.ranking__logo img, .clinic-logo');
+        if (logoImg && logoImg.src) {
+            clinicLogoUrl = logoImg.src;
+            console.log('Logo URL from DOM:', clinicLogoUrl);
+        }
         
+        // クリニックIDを取得してURLを生成
+        const clinicId = firstRankingItem.getAttribute('data-clinic-id') || firstRankingItem.id?.replace('clinic', '');
+        if (clinicId) {
+            const urlHandler = new UrlParamHandler();
+            clinicUrl = urlHandler.getClinicUrlWithRegionId(clinicId, 1);
+        }
+    }
+    
+    // DataManagerからも取得を試みる（フォールバック）
+    if (!clinicLogoUrl && window.dataManager) {
+        const firstClinic = document.querySelector('[data-rank="1"]');
         if (firstClinic) {
             const clinicId = firstClinic.getAttribute('data-clinic-id');
             const clinicCode = window.dataManager.getClinicCodeById(clinicId);
             if (clinicCode) {
-                // ロゴURLを取得
                 clinicLogoUrl = window.dataManager.getClinicText(clinicCode, 'ロゴ', '');
-                // クリニックURLを取得
-                const urlHandler = new UrlParamHandler();
-                clinicUrl = urlHandler.getClinicUrlWithRegionId(clinicId, 1);
             }
         }
     }
 
-    // デフォルトロゴ（取得できなかった場合）
+    // デフォルトロゴ
     if (!clinicLogoUrl) {
-        // ランキング1位の画像から取得を試みる
-        const firstRankingLogo = document.querySelector('#clinic1 .ranking__logo img');
-        if (firstRankingLogo && firstRankingLogo.src) {
-            clinicLogoUrl = firstRankingLogo.src;
-        } else {
-            clinicLogoUrl = './images/logo-placeholder.png';
-        }
+        clinicLogoUrl = './images/logo-placeholder.png';
     }
 
     // モーダルのHTML作成
@@ -5004,7 +5011,13 @@ function initializeScrollModal() {
                 <div class="scroll-modal-left">
                     <img src="${clinicLogoUrl}" alt="1位クリニック" class="scroll-modal-logo">
                 </div>
-                <a href="${clinicUrl}" class="scroll-modal-btn" onclick="if(window.handleClinicClick) handleClinicClick(event, this);">公式サイトへ</a>
+                <a href="${clinicUrl}" class="scroll-modal-btn" onclick="if(window.handleClinicClick) handleClinicClick(event, this);">
+                    <span class="scroll-modal-btn-free">無料</span>
+                    <span class="scroll-modal-btn-text">
+                        <span>カウンセリングを</span>
+                        <span>予約する</span>
+                    </span>
+                </a>
             </div>
         </div>`;
 
