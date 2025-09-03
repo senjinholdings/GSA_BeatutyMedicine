@@ -4985,14 +4985,13 @@ function initializeScrollModal() {
     // モーダルのHTML作成
     const modalHtml = `
         <div class="scroll-bottom-modal">
+            <div class="scroll-modal-bubble">
+                <span>今なら特別キャンペーン実施中！</span>
+            </div>
             <button class="scroll-modal-close">&times;</button>
             <div class="scroll-modal-content">
                 <div class="scroll-modal-left">
                     <img src="${clinicLogoUrl}" alt="1位クリニック" class="scroll-modal-logo">
-                    <div class="scroll-modal-text">
-                        <span class="scroll-modal-badge">期間限定</span>
-                        <p>今なら特別キャンペーン実施中！</p>
-                    </div>
                 </div>
                 <a href="${clinicUrl}" class="scroll-modal-btn" onclick="if(window.handleClinicClick) handleClinicClick(event, this);">詳細を見る</a>
             </div>
