@@ -5004,7 +5004,7 @@ function initializeScrollModal() {
                 <div class="scroll-modal-left">
                     <img src="${clinicLogoUrl}" alt="1位クリニック" class="scroll-modal-logo">
                 </div>
-                <a href="${clinicUrl}" class="scroll-modal-btn" onclick="if(window.handleClinicClick) handleClinicClick(event, this);">詳細を見る</a>
+                <a href="${clinicUrl}" class="scroll-modal-btn" onclick="if(window.handleClinicClick) handleClinicClick(event, this);">公式サイトへ</a>
             </div>
         </div>`;
 
