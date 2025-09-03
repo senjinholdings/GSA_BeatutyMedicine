@@ -4967,12 +4967,13 @@ function initializeScrollModal() {
     const firstRankingItem = document.querySelector('#clinic1, .ranking_box[data-rank="1"]');
     console.log('First ranking item:', firstRankingItem);
     
+    // 1位のクリニックを特定
+    let clinicName = '';
     if (firstRankingItem) {
-        // ロゴ画像を取得
-        const logoImg = firstRankingItem.querySelector('.ranking__logo img, .clinic-logo');
-        if (logoImg && logoImg.src) {
-            clinicLogoUrl = logoImg.src;
-            console.log('Logo URL from DOM:', clinicLogoUrl);
+        // クリニック名を取得
+        const clinicNameElement = firstRankingItem.querySelector('.ranking__name a, .clinic-name');
+        if (clinicNameElement) {
+            clinicName = clinicNameElement.textContent.replace(/\s*＞\s*$/, '').trim();
         }
         
         // クリニックIDを取得してURLを生成
@@ -4980,6 +4981,32 @@ function initializeScrollModal() {
         if (clinicId) {
             const urlHandler = new UrlParamHandler();
             clinicUrl = urlHandler.getClinicUrlWithRegionId(clinicId, 1);
+        }
+    }
+    
+    // クリニック名からロゴパスを構築（TCBの例に従って）
+    if (clinicName) {
+        const clinicMap = {
+            'TCB東京中央美容外科': 'tcb/tcb-logo.webp',
+            'リゼクリニック': 'rize/rize-logo.webp',
+            '湘南美容クリニック': 'sbc/sbc-logo.webp',
+            'レジーナクリニック': 'regina/regina-logo.webp',
+            '品川美容外科': 'shinagawa/shinagawa-logo.webp'
+        };
+        
+        const logoPath = clinicMap[clinicName];
+        if (logoPath) {
+            clinicLogoUrl = `../common_data/images/clinics/${logoPath}`;
+            console.log('Logo URL from clinic map:', clinicLogoUrl);
+        }
+    }
+    
+    // DOM要素から直接ロゴを取得（フォールバック）
+    if (!clinicLogoUrl && firstRankingItem) {
+        const logoImg = firstRankingItem.querySelector('.ranking__logo img, .clinic-logo, .clinic-banner img');
+        if (logoImg && logoImg.src) {
+            clinicLogoUrl = logoImg.src;
+            console.log('Logo URL from DOM:', clinicLogoUrl);
         }
     }
     
