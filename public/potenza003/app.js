@@ -3717,9 +3717,10 @@ class RankingApp {
                     const slidesHtml = imagesForClinic.map((img, idx) => {
                         const keyBase = `case${idx + 1}`;
                         // 各スライドは対応するcaseNを参照（case1へのフォールバックは行わない）
-                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || '—';
-                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || '—';
-                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || '—';
+                        const nameVal = dm.getClinicText(clinicCode, `${keyBase}コース名`, '') || 'ポテンツァ（POTENZA） 治療回数：1回';
+                        const descVal = dm.getClinicText(clinicCode, `${keyBase}施術の説明`, '') || 'RFを照射して毛穴の開きや皮膚のたるみなどを改善する施術です。';
+                        const riskVal = dm.getClinicText(clinicCode, `${keyBase}副作用（リスク）`, '') || '赤み・内出血・腫れ：2～3日程度';
+                        const disclaimerText = '3ヶ月医療痩身ボディメイクを契約された<br>モニター対象の会員の代表的な事例を提示しています。効果には個人差があります。';
                         return `
                             <div class=\"case-slide\" style=\"min-width:100%;box-sizing:border-box;\">
                                 <img src=\"${img.fallbacks[0]}\" alt=\"${img.alt}\" loading=\"lazy\" style=\"width:100%;height:auto;object-fit:contain;\">
@@ -3729,6 +3730,7 @@ class RankingApp {
                                             ${buildRow('コース名', dm.processDecoTags(nameVal))}
                                             ${buildRow('施術の説明', dm.processDecoTags(descVal))}
                                             ${buildRow('副作用<br>（リスク）', dm.processDecoTags(riskVal))}
+                                            <tr><td style="padding: 0 8px !important; background-color: #f8f8f8 !important; font-weight: bold !important; width: 30% !important;"></td><td style="padding: 0 8px !important;">${disclaimerText}</td></tr>
                                         </tbody>
                                     </table>
                                 </div>

@@ -8193,7 +8193,7 @@ body .case-slider .slick-slide img {
 .scroll-modal-bubble {
     position: absolute;
     bottom: 77%;
-    left: 50%;
+    left: 77%;
     transform: translate(-50%, 24px);
     background: #ffffff;
     color: #696969;
