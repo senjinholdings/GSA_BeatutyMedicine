@@ -8100,25 +8100,26 @@ body .case-slider .slick-slide img {
 .scroll-bottom-modal {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 50%;
+    right: auto;
     height: 10vh; /* ビューポートの10% */
     min-height: 80px;
     max-height: 120px;
     background: #fff; /* 背景は白 */
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
-    transform: translateY(100%);
+    transform: translate(-50%, 100%);
     transition: transform 0.3s ease-in-out;
     z-index: 9999;
     display: flex;
     align-items: center;
     padding: 0 20px;
-    max-width: none; /* グローバル幅制限の影響を受けない */
+    width: 100%;
+    max-width: 768px; /* PC時の最大幅 */
     margin: 0;
 }
 
 .scroll-bottom-modal.show {
-    transform: translateY(0);
+    transform: translate(-50%, 0);
 }
 
 /* 表示時に吹き出しを上方向へ＆フェードイン */
@@ -8155,7 +8156,7 @@ body .case-slider .slick-slide img {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
+    max-width: 768px;
     margin: 0 auto;
     gap: 10px;
     padding: 10px 0;
@@ -8198,7 +8199,7 @@ body .case-slider .slick-slide img {
     color: #696969;
     padding: 6px 20px;
     border-radius: 16px;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 700;
     white-space: nowrap;
     box-shadow: 0 2px 6px rgba(0,0,0,0.15);
@@ -8242,12 +8243,12 @@ body .case-slider .slick-slide img {
 
 .scroll-modal-btn-free {
     background: #f07d99;
-    padding: 8px 15px;
+    padding: 8px 12px;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     /* border-right: 1px solid #cf657d; */
     border-bottom: solid 2px #bf367b;
@@ -8275,7 +8276,7 @@ body .case-slider .slick-slide img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 15px 0 0px;
+    padding: 0 10px 0 8px;
     font-size: 14px;
     color: #fff;
 }
@@ -8291,7 +8292,7 @@ body .case-slider .slick-slide img {
 }
 
 @media (max-width: 768px) {
-    .scroll-bottom-modal { padding: 0 15px; }
+    .scroll-bottom-modal { padding: 0 7px; }
     .scroll-modal-bubble { left: 50%; }
     .scroll-modal-content { gap: 10px; padding: 10px 0; }
     .scroll-modal-left { flex: 1; gap: 10px; }
@@ -8303,6 +8304,28 @@ body .case-slider .slick-slide img {
     .scroll-modal-text { gap: 5px; }
     .scroll-modal-text p { font-size: 14px; }
     .scroll-modal-btn { padding: 0px 0px; font-size: 13px; }
+}
+
+/* 768px以上での比率調整（CTAとテキストの視覚的バランスを維持） */
+@media (min-width: 768px) {
+    .scroll-modal-content { max-width: 768px; }
+    .scroll-modal-btn { height: 54px; font-size: 15px; }
+    .scroll-modal-btn-free { padding: 8px 18px; font-size: 18px; }
+    .scroll-modal-btn-text { padding: 0 40px; }
+    .scroll-modal-btn-text span { font-size: 14px; }
+    .scroll-modal-btn-arrow { font-size: 16px; padding: 0 12px 0 10px; }
+    /* ロゴの見え方の調整（CTA高さとバランス） */
+    .scroll-modal-left { gap: 12px; }
+    .scroll-modal-logo {
+        height: 48px !important;
+        max-width: 140px !important;
+        padding: 6px;
+    }
+    /* 吹き出し（footer-modal1）の見え方調整 */
+    .scroll-modal-bubble {
+        font-size: 13px;
+        padding: 8px 36px;
+    }
 }
 
 /* =============================
